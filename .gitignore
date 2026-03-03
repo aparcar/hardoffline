@@ -1,0 +1,9 @@
+node_modules/
+*.xml
+*.pdf
+captures/
+captures_/
+site-mirror_/
+cookies.txt
+tracker.py
+terms_page.html

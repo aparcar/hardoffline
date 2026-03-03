@@ -1,0 +1,26 @@
+body { background: #f5f6fa; }
+.card-header h6 { font-size: 0.9rem; }
+.form-code { font-size: .7em; font-family: SFMono-Regular, Menlo, monospace; color: #8893a2; font-weight: 400; margin-right: .35em; }
+.bg-dark .form-code { color: #8e99a4; }
+.bg-primary .form-code { color: rgba(255,255,255,.55); }
+.form-label { font-size: 0.82rem; font-weight: 600; margin-bottom: 2px; }
+.form-control, .form-select { font-size: 0.85rem; }
+.table { font-size: 0.8rem; }
+.table input { font-size: 0.8rem; padding: 2px 4px; }
+.table select { font-size: 0.8rem; padding: 2px 4px; }
+.table th { white-space: nowrap; font-size: 0.75rem; }
+.nav-tabs .nav-link { font-size: 0.85rem; font-weight: 600; }
+.nav-tabs .nav-link.active { background: #0d6efd; color: #fff; }
+.fp-input { width: 100px; text-align: right; }
+.fp-input-wide { width: 150px; }
+.fp-input-narrow { width: 60px; text-align: right; }
+.fp-calculated { background: #e8f5e9 !important; font-weight: 600; white-space: nowrap; }
+.fp-total { background: #fff3cd !important; font-weight: 700; white-space: nowrap; }
+.fp-grand-total { background: #343a40 !important; color: #fff !important; font-weight: 700; white-space: nowrap; }
+/* flatpickr alt input styling */
+input.flatpickr-input[readonly] { font-size: 0.85rem; background: #fff; }
+.btn-del-row { padding: 1px 5px; font-size: 0.7rem; }
+#saveStatus { font-size: 0.75rem; }
+.char-counter { font-size: 0.7rem; color: #8893a2; text-align: right; margin-top: 1px; }
+.char-counter.warn { color: #dc3545; font-weight: 600; }
+.card { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }

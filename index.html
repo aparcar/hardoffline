@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>easy-Online Offline - AZAP Formular</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+  <link href="css/app.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark bg-primary sticky-top">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1"><i class="bi bi-file-earmark-text"></i> easy-Online Offline <small class="text-white-50">AZAP</small></span>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-light btn-sm" id="btnImportXml"><i class="bi bi-upload"></i> XML Import</button>
+      <button class="btn btn-warning btn-sm" id="btnExportXml"><i class="bi bi-download"></i> XML Export</button>
+      <button class="btn btn-outline-light btn-sm" id="btnClearAll"><i class="bi bi-trash"></i> Neu</button>
+      <input type="file" id="fileInput" accept=".xml" class="d-none">
+      <span class="badge bg-light text-dark align-self-center" id="saveStatus"><i class="bi bi-check-circle"></i> Gespeichert</span>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid mt-3">
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabKerndaten" role="tab">1. Kerndaten</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabInstitutionen" role="tab">2. Institutionen</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAnsprechpartner" role="tab">3. Ansprechpartner</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabPersonal" role="tab">4. Personal</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabSachmittel" role="tab">5. Sachmittel</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabFinanzierung" role="tab">6. Finanzierung</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabErklaerungen" role="tab">7. Erkl&auml;rungen</a></li>
+  </ul>
+
+  <div class="tab-content mt-3 mb-5" id="mainTabContent">
+
+    <!-- ==================== TAB 1: KERNDATEN ==================== -->
+    <div class="tab-pane fade show active" id="tabKerndaten" role="tabpanel">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Kerndaten Finanzplan</h6></div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-12">
+                  <label class="form-label">Mandant (Ministerium)</label>
+                  <input type="text" class="form-control" data-field="Mandant" value="Bundesministerium f&uuml;r Forschung, Technologie und Raumfahrt">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">F&ouml;rderma&szlig;nahme</label>
+                  <input type="text" class="form-control" data-field="Foerdermassnahme">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">F&ouml;rderbereich</label>
+                  <input type="text" class="form-control" data-field="Foerderbereich">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">F&ouml;rderma&szlig;nahme (lang)</label>
+                  <input type="text" class="form-control" data-field="FoerdermassnahmeLang">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">F&ouml;rderbereich (lang)</label>
+                  <input type="text" class="form-control" data-field="FoerderbereichLang">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Formulartyp</label>
+                  <select class="form-select" data-field="Formulartyp">
+                    <option value="AZAP">AZAP</option>
+                    <option value="AZA">AZA</option>
+                    <option value="AZK">AZK</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label"><span class="form-code">V01</span>Antragsverfahren</label>
+                  <select class="form-select" data-field="kng_neu_aufst_anschl">
+                    <option value="Erstzuwendung">Erstzuwendung</option>
+                    <option value="Aufstockung">Aufstockung</option>
+                    <option value="Anschlusszuwendung">Anschlusszuwendung</option>
+                  </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" data-field="istAnschluss" id="chkIstAnschluss">
+                    <label class="form-check-label small" for="chkIstAnschluss">Anschlusszuwendung?</label>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">FKZ Anschluss</label>
+                  <input type="text" class="form-control" data-field="Foerderkennzeichen_Anschlussauftrag" maxlength="10" placeholder="F&ouml;rderkennzeichen">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Laufzeit von</label>
+                  <input type="text" class="form-control datepicker" data-field="von" id="projektVon" placeholder="TT.MM.JJJJ">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Laufzeit bis</label>
+                  <input type="text" class="form-control datepicker" data-field="bis" id="projektBis" placeholder="TT.MM.JJJJ">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Antragsdatum</label>
+                  <input type="text" class="form-control datepicker" data-field="Antragsdatum" placeholder="TT.MM.JJJJ">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Antragsort</label>
+                  <input type="text" class="form-control" data-field="Antragsort" maxlength="40">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">W&auml;hrung</label>
+                  <input type="text" class="form-control" data-field="Waehrung" value="EUR" readonly>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" data-field="Vorhaben_nicht_begonnen" id="chkNichtBegonnen">
+                    <label class="form-check-label" for="chkNichtBegonnen">Vorhaben noch nicht begonnen</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" data-field="Kennzeichen_Datenschutzerklaerung" id="chkDatenschutz">
+                    <label class="form-check-label" for="chkDatenschutz">Datenschutzerkl&auml;rung akzeptiert</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Vorhabenbeschreibung</h6></div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label"><span class="form-code">V05</span>Akronym (max. 20 Zeichen)</label>
+                  <input type="text" class="form-control" data-field="Akronym" maxlength="20">
+                </div>
+                <div class="col-md-8">
+                  <label class="form-label"><span class="form-code">V06</span>Thema</label>
+                  <textarea class="form-control" data-field="Thema" rows="3" maxlength="313"></textarea>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Thema (Fremdsprache)</label>
+                  <textarea class="form-control" data-field="fremd_Thema" rows="3" maxlength="2000"></textarea>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label"><span class="form-code">V07</span>Beschreibung 1</label>
+                  <textarea class="form-control" data-field="Beschreibung1" rows="5" maxlength="2000"></textarea>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Beschreibung 2</label>
+                  <textarea class="form-control" data-field="Beschreibung2" rows="5" maxlength="2000"></textarea>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label"><span class="form-code">V08</span>Ergebnisverwertung</label>
+                  <textarea class="form-control" data-field="Ergebnisverwertung" rows="5" maxlength="2000"></textarea>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label"><span class="form-code">V09</span>Vorhabenbeschreibung (Fremdsprache)</label>
+                  <textarea class="form-control" data-field="fremd_Beschreibung1" rows="5" maxlength="2000"></textarea>
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label">Arbeitsplan (Fremdsprache)</label>
+                  <textarea class="form-control" data-field="fremd_Beschreibung2" rows="5" maxlength="2000"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Verwertungsplan</h6></div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-12"><label class="form-label">1.1 Marktpotential</label><textarea class="form-control" data-field="TF1" rows="5" maxlength="2000"></textarea></div>
+                <div class="col-md-12"><label class="form-label">1.2 Branchenstruktur / Marktzugang</label><textarea class="form-control" data-field="TF2" rows="5" maxlength="2000"></textarea></div>
+                <div class="col-md-12"><label class="form-label">1.3 Eigene Fertigungsressourcen</label><textarea class="form-control" data-field="TF3" rows="5" maxlength="2000"></textarea></div>
+                <div class="col-md-12"><label class="form-label">2.1 St&uuml;ckzahlen / Umsatz</label><textarea class="form-control" data-field="TF4" rows="5" maxlength="2000"></textarea></div>
+                <div class="col-md-4"><label class="form-label">2.2 Zeitpunkt Markteinf&uuml;hrung</label><input type="text" class="form-control datepicker" data-field="Zeitpunkt"></div>
+                <div class="col-md-12"><label class="form-label">2.3 Vermarktungsregionen</label><textarea class="form-control" data-field="TF5" rows="5" maxlength="2000"></textarea></div>
+                <div class="col-md-12"><label class="form-label">2.4 Konzerninterne Verwertungsregelungen</label><textarea class="form-control" data-field="TF6" rows="5" maxlength="2000"></textarea></div>
+                <div class="col-md-12"><label class="form-label">3.1 Verwertung der Verbundergebnisse</label><textarea class="form-control" data-field="TF7" rows="5" maxlength="2000"></textarea></div>
+                <div class="col-md-12"><label class="form-label">3.2 Wissenschaftl. und wirtschaftl. Anschlussf&auml;higkeit</label><textarea class="form-control" data-field="TF8" rows="5" maxlength="2000"></textarea></div>
+                <div class="col-md-12"><label class="form-label">4. Verwertungsm&ouml;glichkeiten au&szlig;erhalb des Vorhabens</label><textarea class="form-control" data-field="TF9" rows="5" maxlength="2000"></textarea></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card mb-3 border-info">
+            <div class="card-header bg-info text-white"><h6 class="mb-0"><i class="bi bi-info-circle"></i> Formular-Info</h6></div>
+            <div class="card-body small">
+              <p><strong>Vorlage:</strong> <span data-field-display="Vorlage">AZA</span></p>
+              <p><strong>XSD Version:</strong> <span data-field-display="XSD_Version">3.15.0</span></p>
+              <p><strong>easy-Online Version:</strong> <span data-field-display="easyOnlineVersion_aktuell">easy-Online 3.4.3.0</span></p>
+              <p><strong>Kennung:</strong> <span data-field-display="easyOnlineKennung">ENTWURF</span></p>
+              <p><strong>Letzte Benutzung:</strong> <span data-field-display="letzte_Benutzung" id="letzteBenutzung">-</span></p>
+              <hr>
+              <p class="text-muted">Berechnete Jahreszahlen aus Laufzeit:</p>
+              <p><strong>Von Jahr:</strong> <span id="vonJahrDisplay">-</span></p>
+              <p><strong>Bis Jahr:</strong> <span id="bisJahrDisplay">-</span></p>
+              <p><strong>Projektjahre:</strong> <span id="projektJahreDisplay">-</span></p>
+            </div>
+          </div>
+          <div class="card border-secondary">
+            <div class="card-header bg-secondary text-white"><h6 class="mb-0">Formulareinstellungen</h6></div>
+            <div class="card-body">
+              <div class="mb-2">
+                <label class="form-label small">Summarisches Vorhaben</label>
+                <select class="form-select form-select-sm" data-field="Summarisches_Vorhaben">
+                  <option value="Nein">Nein</option>
+                  <option value="Ja">Ja</option>
+                </select>
+              </div>
+              <div class="mb-2">
+                <label class="form-label small">Kennung Antragsverfahren</label>
+                <select class="form-select form-select-sm" data-field="KennungAntragsverfahren">
+                  <option value="N">N - Einfacher Antrag</option>
+                  <option value="S">S - Sammelantrag</option>
+                  <option value="E">E - Einzelantrag</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 2: INSTITUTIONEN ==================== -->
+    <div class="tab-pane fade" id="tabInstitutionen" role="tabpanel">
+      <div class="row">
+        <div class="col-lg-6">
+          <!-- ZE: Zuwendungsempfaenger -->
+          <div class="card mb-3">
+            <div class="card-header bg-primary text-white"><h6 class="mb-0"><span class="form-code">A00</span>Zuwendungsempf&auml;nger (Antragsteller)</h6></div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-12"><label class="form-label">Name</label><textarea class="form-control" data-field="Name_ZE" rows="2" maxlength="200"></textarea></div>
+                <div class="col-8"><label class="form-label">Stra&szlig;e</label><input type="text" class="form-control" data-field="Strasse_ZE" maxlength="50"></div>
+                <div class="col-4"><label class="form-label">PLZ</label><input type="text" class="form-control" data-field="PLZ_Strasse_ZE" maxlength="15"></div>
+                <div class="col-6"><label class="form-label">Ort</label><input type="text" class="form-control" data-field="Ort_Strasse_ZE" maxlength="50"></div>
+                <div class="col-6"><label class="form-label">Land</label><select class="form-select" data-field="Land_ZE"></select></div>
+                <div class="col-6"><label class="form-label">Telefon</label><input type="text" class="form-control" data-field="TelefonNr_ZE" maxlength="25"></div>
+                <div class="col-6"><label class="form-label">Fax</label><input type="text" class="form-control" data-field="FaxNr_ZE" maxlength="25"></div>
+                <div class="col-6"><label class="form-label">E-Mail</label><input type="email" class="form-control" data-field="E_Mail_Adresse_ZE" maxlength="80"></div>
+                <div class="col-6"><label class="form-label">Web</label><input type="text" class="form-control" data-field="Web_Adresse_ZE" maxlength="256"></div>
+                <div class="col-4"><label class="form-label">Postfach</label><input type="text" class="form-control" data-field="Postfach_ZE" maxlength="15"></div>
+                <div class="col-4"><label class="form-label">PLZ Postfach</label><input type="text" class="form-control" data-field="PLZ_Postfach_ZE" maxlength="15"></div>
+                <div class="col-4"><label class="form-label">Ort Postfach</label><input type="text" class="form-control" data-field="Ort_Postfach_ZE" maxlength="50"></div>
+                <div class="col-4"><label class="form-label">PLZ Gro&szlig;kunde</label><input type="text" class="form-control" data-field="PLZ_Grosskunde_ZE" maxlength="15"></div>
+                <div class="col-4"><label class="form-label">Ort Gro&szlig;kunde</label><input type="text" class="form-control" data-field="Ort_Grosskunde_ZE" maxlength="50"></div>
+                <div class="col-6">
+                  <label class="form-label">Rechtsform</label>
+                  <select class="form-select" data-field="Rechtsform"></select>
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Buchf&uuml;hrung</label>
+                  <select class="form-select" data-field="Buchfuehrung">
+                    <option value="kaufm&auml;nnisch (doppelt)">kaufm&auml;nnisch (doppelt)</option>
+                    <option value="kameralistisch">kameralistisch</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Vorsteuerabzug</label>
+                  <select class="form-select" data-field="Vor_Umsatzsteuerabzugsberechtigt_JNT">
+                    <option value="nicht zum Vorsteuerabzug berechtigt.">nicht zum Vorsteuerabzug berechtigt</option>
+                    <option value="zum Vorsteuerabzug berechtigt.">zum Vorsteuerabzug berechtigt</option>
+                    <option value="teilweise zum Vorsteuerabzug berechtigt.">teilweise zum Vorsteuerabzug berechtigt</option>
+                  </select>
+                </div>
+                <div class="col-4"><div class="form-check mt-2"><input class="form-check-input" type="checkbox" data-field="oeffentlich_finanziert" id="chkOeff"><label class="form-check-label small" for="chkOeff">&Ouml;ffentl. finanziert</label></div></div>
+                <div class="col-4"><div class="form-check mt-2"><input class="form-check-input" type="checkbox" data-field="Besserstellungsverbot" id="chkBesser"><label class="form-check-label small" for="chkBesser">Besserstellungsverbot</label></div></div>
+                <div class="col-4"><div class="form-check mt-2"><input class="form-check-input" type="checkbox" data-field="eigene_Pruefungseinrichtung" id="chkPruef"><label class="form-check-label small" for="chkPruef">Eigene Pr&uuml;fungseinr.</label></div></div>
+                <div class="col-4"><div class="form-check mt-2"><input class="form-check-input" type="checkbox" data-field="Ausbildungsbetrieb" id="chkAusb"><label class="form-check-label small" for="chkAusb">Ausbildungsbetrieb</label></div></div>
+                <div class="col-4"><label class="form-label small">Anzahl Auszubildende</label><input type="number" class="form-control form-control-sm" data-field="Anzahl_Auszubildende" value="0"></div>
+                <div class="col-4"><label class="form-label small">Bezugsjahr</label><input type="text" class="form-control form-control-sm" data-field="Bezugsjahr"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vertragspartner -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0"><span class="form-code">B00</span>Vertragspartner</h6></div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-6"><label class="form-label"><span class="form-code">B03</span>Vertragsart</label><input type="text" class="form-control" data-field="VertragsArt_Unternehmen" maxlength="50"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">B02</span>Vertragspartner/in</label><input type="text" class="form-control" data-field="Vertragspartner_Unternehmen" maxlength="50"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <!-- ST: Standort -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0"><span class="form-code">S00</span>Standort / Ausf&uuml;hrende Stelle</h6></div>
+            <div class="card-body">
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="stSameAsZe" checked>
+                <label class="form-check-label" for="stSameAsZe">Identisch mit Antragsteller</label>
+              </div>
+              <div id="stFields" class="row g-2">
+                <div class="col-12"><label class="form-label"><span class="form-code">S01</span>Name</label><textarea class="form-control" data-field="Name_ST" rows="2" maxlength="200"></textarea></div>
+                <div class="col-8"><label class="form-label"><span class="form-code">S02</span>Stra&szlig;e</label><input type="text" class="form-control" data-field="Strasse_ST" maxlength="50"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">S03</span>PLZ</label><input type="text" class="form-control" data-field="PLZ_Strasse_ST" maxlength="15"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">S04</span>Ort</label><input type="text" class="form-control" data-field="Ort_Strasse_ST" maxlength="50"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">S05</span>Land</label><select class="form-select" data-field="Land_ST"></select></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">S11</span>Telefon</label><input type="text" class="form-control" data-field="TelefonNr_ST" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">S12</span>Fax</label><input type="text" class="form-control" data-field="FaxNr_ST" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">S13</span>E-Mail</label><input type="email" class="form-control" data-field="E_Mail_Adresse_ST" maxlength="80"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">S14</span>Web</label><input type="text" class="form-control" data-field="Web_Adresse_ST" maxlength="256"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">S06</span>Postfach</label><input type="text" class="form-control" data-field="Postfach_ST" maxlength="15"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">S07</span>PLZ Postfach</label><input type="text" class="form-control" data-field="PLZ_Postfach_ST" maxlength="15"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">S08</span>Ort Postfach</label><input type="text" class="form-control" data-field="Ort_Postfach_ST" maxlength="50"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">S09</span>PLZ Gro&szlig;kunde</label><input type="text" class="form-control" data-field="PLZ_Grosskunde_ST" maxlength="15"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">S10</span>Ort Gro&szlig;kunde</label><input type="text" class="form-control" data-field="Ort_Grosskunde_ST" maxlength="50"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GE: Geldinstitut -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0"><span class="form-code">G00</span>Geldinstitut / Zahlungsempf&auml;nger</h6></div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-6">
+                  <label class="form-label">Zuordnung</label>
+                  <select class="form-select" data-field="Institution_GE">
+                    <option value="Antragsteller">Antragsteller</option>
+                    <option value="Andere">Andere</option>
+                    <option value="ausf&uuml;hrende Stelle">Ausf&uuml;hrende Stelle</option>
+                  </select>
+                </div>
+                <div class="col-6"><label class="form-label"><span class="form-code">G01</span>Name</label><textarea class="form-control" data-field="Name_GE" rows="2" maxlength="200"></textarea></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">G03</span>Land</label><select class="form-select" data-field="GeldinstitutLand"></select></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">G02</span>Geldinstitut</label><input type="text" class="form-control" data-field="Geldinstitut" maxlength="60"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">G05</span>IBAN</label><input type="text" class="form-control" data-field="IBAN" maxlength="34"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">G04</span>BIC</label><input type="text" class="form-control" data-field="BIC" maxlength="15"></div>
+                <div class="col-12"><label class="form-label"><span class="form-code">G06</span>Verbuchungsstelle</label><input type="text" class="form-control" data-field="Verbuchungsstelle" maxlength="71"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ZK: Zustelladresse -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0"><span class="form-code">K00</span>Korrespondenzadresse</h6></div>
+            <div class="card-body">
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="zkSameAsZe" checked>
+                <label class="form-check-label" for="zkSameAsZe">Identisch mit Antragsteller</label>
+              </div>
+              <div id="zkFields" class="row g-2">
+                <div class="col-6">
+                  <label class="form-label">Zuordnung</label>
+                  <select class="form-select" data-field="Institution_ZK">
+                    <option value="Antragsteller">Antragsteller</option>
+                    <option value="Andere">Andere</option>
+                    <option value="ausf&uuml;hrende Stelle">Ausf&uuml;hrende Stelle</option>
+                  </select>
+                </div>
+                <div class="col-6"><label class="form-label"><span class="form-code">K01</span>Name</label><textarea class="form-control" data-field="Name_ZK" rows="2" maxlength="200"></textarea></div>
+                <div class="col-8"><label class="form-label"><span class="form-code">K02</span>Stra&szlig;e</label><input type="text" class="form-control" data-field="Strasse_ZK" maxlength="50"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">K03</span>PLZ</label><input type="text" class="form-control" data-field="PLZ_Strasse_ZK" maxlength="15"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">K04</span>Ort</label><input type="text" class="form-control" data-field="Ort_Strasse_ZK" maxlength="50"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">K05</span>Land</label><select class="form-select" data-field="Land_ZK"></select></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">K06</span>Postfach</label><input type="text" class="form-control" data-field="Postfach_ZK" maxlength="15"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">K07</span>PLZ Postfach</label><input type="text" class="form-control" data-field="PLZ_Postfach_ZK" maxlength="15"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">K08</span>Ort Postfach</label><input type="text" class="form-control" data-field="Ort_Postfach_ZK" maxlength="50"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">K09</span>PLZ Gro&szlig;kunde</label><input type="text" class="form-control" data-field="PLZ_Grosskunde_ZK" maxlength="15"></div>
+                <div class="col-4"><label class="form-label"><span class="form-code">K10</span>Ort Gro&szlig;kunde</label><input type="text" class="form-control" data-field="Ort_Grosskunde_ZK" maxlength="50"></div>
+                <div class="col-6"><label class="form-label">Gesch&auml;ftszeichen</label><input type="text" class="form-control" data-field="Geschaeftszeichen_ZK" maxlength="30"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KO: Kooperationspartner -->
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><span class="form-code">Z00</span>Kooperationspartner</h6>
+          <button class="btn btn-success btn-sm" onclick="FP.addKopiRow()"><i class="bi bi-plus-circle"></i> Zeile</button>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm table-bordered mb-0">
+            <thead class="table-light">
+              <tr><th>Name</th><th>PLZ</th><th>Ort</th><th>Land</th><th>Rolle</th><th></th></tr>
+            </thead>
+            <tbody id="tbodyKopiPartner"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 3: ANSPRECHPARTNER ==================== -->
+    <div class="tab-pane fade" id="tabAnsprechpartner" role="tabpanel">
+      <div class="row">
+        <!-- PL: Projektleitung -->
+        <div class="col-lg-4">
+          <div class="card mb-3">
+            <div class="card-header bg-success text-white"><h6 class="mb-0">Projektleitung (PL)</h6></div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-12"><label class="form-label"><span class="form-code">P04</span>Akad. Grad</label><input type="text" class="form-control" data-field="akad_Grad_PL" maxlength="20"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P02</span>Vorname</label><input type="text" class="form-control" data-field="Vorname_PL" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P03</span>Nachname</label><input type="text" class="form-control" data-field="Name_PL" maxlength="153"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P05</span>Telefon</label><input type="text" class="form-control" data-field="Telefon_PL" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P06</span>Fax</label><input type="text" class="form-control" data-field="Fax_PL" maxlength="25"></div>
+                <div class="col-12"><label class="form-label"><span class="form-code">P07</span>E-Mail</label><input type="email" class="form-control" data-field="Email_PL" maxlength="80"></div>
+                <div class="col-6"><div class="form-check mt-2"><input class="form-check-input" type="checkbox" data-field="EmailHatZugang_PL" id="chkZugangPL"><label class="form-check-label small" for="chkZugangPL">Hat Online-Zugang</label></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PA: Administrative Ansprechperson -->
+        <div class="col-lg-4">
+          <div class="card mb-3">
+            <div class="card-header bg-info text-white"><h6 class="mb-0">Admin. Ansprechperson (PA)</h6></div>
+            <div class="card-body">
+              <div class="mb-2">
+                <label class="form-label">Daten &uuml;bernehmen</label>
+                <select class="form-select form-select-sm" data-field="kopiere_in_PA" id="kopierePa">
+                  <option value="aus folgenden Eingabefeldern">aus folgenden Eingabefeldern</option>
+                  <option value="der Projektleitung">der Projektleitung</option>
+                </select>
+              </div>
+              <div class="row g-2">
+                <div class="col-12"><label class="form-label"><span class="form-code">P11</span>Akad. Grad</label><input type="text" class="form-control" data-field="akad_Grad_PA" maxlength="20"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P09</span>Vorname</label><input type="text" class="form-control" data-field="Vorname_PA" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P10</span>Nachname</label><input type="text" class="form-control" data-field="Name_PA" maxlength="153"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P12</span>Telefon</label><input type="text" class="form-control" data-field="Telefon_PA" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P13</span>Fax</label><input type="text" class="form-control" data-field="Fax_PA" maxlength="25"></div>
+                <div class="col-12"><label class="form-label"><span class="form-code">P14</span>E-Mail</label><input type="email" class="form-control" data-field="Email_PA" maxlength="80"></div>
+                <div class="col-6"><div class="form-check mt-2"><input class="form-check-input" type="checkbox" data-field="EmailHatZugang_PA" id="chkZugangPA"><label class="form-check-label small" for="chkZugangPA">Hat Online-Zugang</label></div></div>
+              </div>
+              <hr>
+              <p class="small text-muted mb-1"><strong>Stellvertretung (A2)</strong></p>
+              <div class="row g-2">
+                <div class="col-12"><label class="form-label"><span class="form-code">P41</span>Akad. Grad</label><input type="text" class="form-control" data-field="akad_Grad_A2" maxlength="20"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P39</span>Vorname</label><input type="text" class="form-control" data-field="Vorname_A2" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P40</span>Nachname</label><input type="text" class="form-control" data-field="Name_A2" maxlength="153"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P42</span>Telefon</label><input type="text" class="form-control" data-field="Telefon_A2" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P43</span>Fax</label><input type="text" class="form-control" data-field="Fax_A2" maxlength="25"></div>
+                <div class="col-12"><label class="form-label"><span class="form-code">P44</span>E-Mail</label><input type="email" class="form-control" data-field="Email_A2" maxlength="80"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UZ: Bevollmaechtigter -->
+        <div class="col-lg-4">
+          <div class="card mb-3">
+            <div class="card-header bg-warning"><h6 class="mb-0">Bevollm&auml;chtigte/r / Unterzeichner/in (UZ)</h6></div>
+            <div class="card-body">
+              <div class="mb-2">
+                <label class="form-label">Daten &uuml;bernehmen</label>
+                <select class="form-select form-select-sm" data-field="kopiere_in_UZ" id="kopiereUz">
+                  <option value="aus folgenden Eingabefeldern">aus folgenden Eingabefeldern</option>
+                  <option value="der Projektleitung">der Projektleitung</option>
+                  <option value="der administrativen Ansprechperson">der admin. Ansprechperson</option>
+                </select>
+              </div>
+              <div class="row g-2">
+                <div class="col-12"><label class="form-label"><span class="form-code">P18</span>Akad. Grad</label><input type="text" class="form-control" data-field="akad_Grad_UZ" maxlength="20"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P16</span>Vorname</label><input type="text" class="form-control" data-field="Vorname_UZ" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P17</span>Nachname</label><input type="text" class="form-control" data-field="Name_UZ" maxlength="153"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P19</span>Telefon</label><input type="text" class="form-control" data-field="Telefon_UZ" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P20</span>Fax</label><input type="text" class="form-control" data-field="Fax_UZ" maxlength="25"></div>
+                <div class="col-12"><label class="form-label"><span class="form-code">P21</span>E-Mail</label><input type="email" class="form-control" data-field="Email_UZ" maxlength="80"></div>
+                <div class="col-6"><div class="form-check mt-2"><input class="form-check-input" type="checkbox" data-field="EmailHatZugang_UZ" id="chkZugangUZ"><label class="form-check-label small" for="chkZugangUZ">Hat Online-Zugang</label></div></div>
+              </div>
+              <hr>
+              <p class="small text-muted mb-1"><strong>Stellvertretung (Z2)</strong></p>
+              <div class="row g-2">
+                <div class="col-12"><label class="form-label"><span class="form-code">P48</span>Akad. Grad</label><input type="text" class="form-control" data-field="akad_Grad_Z2" maxlength="20"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P46</span>Vorname</label><input type="text" class="form-control" data-field="Vorname_Z2" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P47</span>Nachname</label><input type="text" class="form-control" data-field="Name_Z2" maxlength="153"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P49</span>Telefon</label><input type="text" class="form-control" data-field="Telefon_Z2" maxlength="25"></div>
+                <div class="col-6"><label class="form-label"><span class="form-code">P50</span>Fax</label><input type="text" class="form-control" data-field="Fax_Z2" maxlength="25"></div>
+                <div class="col-12"><label class="form-label"><span class="form-code">P51</span>E-Mail</label><input type="email" class="form-control" data-field="Email_Z2" maxlength="80"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 4: PERSONAL ==================== -->
+    <div class="tab-pane fade" id="tabPersonal" role="tabpanel">
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><span class="form-code">F0812</span>Personalausgaben Tarif 1 (E12-E15)</h6>
+          <button class="btn btn-success btn-sm" onclick="FP.addPersonRow('tarif1')"><i class="bi bi-plus-circle"></i> Zeile hinzuf&uuml;gen</button>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm table-bordered" id="tableTarif1">
+            <thead class="table-light" id="theadTarif1"></thead>
+            <tbody id="tbodyTarif1"></tbody>
+            <tfoot class="table-warning" id="tfootTarif1"></tfoot>
+          </table>
+        </div>
+        <div class="card-footer">
+          <label class="form-label">Begr&uuml;ndung Namentliche Benennung (rpf)</label>
+          <textarea class="form-control" rows="2" id="rpfTarif1" placeholder="Begr&uuml;ndung f&uuml;r namentliche Benennung..." maxlength="2000" onchange="FP.rpfBegruendung.tarif1=this.value"></textarea>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><span class="form-code">F0817</span>Personalausgaben Tarif 2 (E1-E11)</h6>
+          <button class="btn btn-success btn-sm" onclick="FP.addPersonRow('tarif2')"><i class="bi bi-plus-circle"></i> Zeile hinzuf&uuml;gen</button>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm table-bordered" id="tableTarif2">
+            <thead class="table-light" id="theadTarif2"></thead>
+            <tbody id="tbodyTarif2"></tbody>
+            <tfoot class="table-warning" id="tfootTarif2"></tfoot>
+          </table>
+        </div>
+        <div class="card-footer">
+          <label class="form-label">Begr&uuml;ndung Namentliche Benennung (rpf)</label>
+          <textarea class="form-control" rows="2" id="rpfTarif2" placeholder="Begr&uuml;ndung f&uuml;r namentliche Benennung..." maxlength="2000" onchange="FP.rpfBegruendung.tarif2=this.value"></textarea>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><span class="form-code">F0820</span>Personalausgaben Tarif 3 (Besch&auml;ftigungsentgelte)</h6>
+          <button class="btn btn-success btn-sm" onclick="FP.addPersonRow('tarif3')"><i class="bi bi-plus-circle"></i> Zeile hinzuf&uuml;gen</button>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm table-bordered" id="tableTarif3">
+            <thead class="table-light" id="theadTarif3"></thead>
+            <tbody id="tbodyTarif3"></tbody>
+            <tfoot class="table-warning" id="tfootTarif3"></tfoot>
+          </table>
+        </div>
+        <div class="card-footer">
+          <label class="form-label">Begr&uuml;ndung Besch&auml;ftigungsentgelte (rpf)</label>
+          <textarea class="form-control" rows="2" id="rpfTarif3" placeholder="Begr&uuml;ndung f&uuml;r Besch&auml;ftigungsentgelte..." maxlength="2000" onchange="FP.rpfBegruendung.tarif3=this.value"></textarea>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><span class="form-code">F0822</span>Besch&auml;ftigungsentgelte</h6>
+          <button class="btn btn-success btn-sm" onclick="FP.addSonstigeEntgelteRow()"><i class="bi bi-plus-circle"></i></button>
+        </div>
+        <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadSonstigeEntgelte"></thead><tbody id="tbodySonstigeEntgelte"></tbody><tfoot class="table-warning" id="tfootSonstigeEntgelte"></tfoot></table></div>
+        <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfSonstigeEntgelte" placeholder="Erl&auml;uterung/Begr&uuml;ndung zu Besch&auml;ftigungsentgelte..." maxlength="2000" onchange="FP.rpfBegruendung.SonstigeEntgelte=this.value"></textarea></div>
+      </div>
+
+      <div class="card mb-3 border-dark">
+        <div class="card-header bg-dark text-white"><h6 class="mb-0"><span class="form-code">F0824</span>Personalausgaben Gesamt</h6></div>
+        <div class="card-body">
+          <table class="table table-sm table-bordered mb-0" id="tablePersonalGesamt">
+            <thead class="table-dark"><tr id="theadPersonalGesamt"></tr></thead>
+            <tbody id="tbodyPersonalGesamt"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 5: SACHMITTEL ==================== -->
+    <div class="tab-pane fade" id="tabSachmittel" role="tabpanel">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="card mb-3" data-section="Gegenstaende">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0831</span>Gegenst&auml;nde &gt;800&euro;</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addSachRow('Gegenstaende')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadGegenstaende"></thead><tbody id="tbodyGegenstaende"></tbody><tfoot class="table-warning" id="tfootGegenstaende"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfGegenstaende" placeholder="Begr&uuml;ndung Gegenst&auml;nde..." maxlength="2000" onchange="FP.rpfBegruendung.Gegenstaende=this.value"></textarea></div>
+          </div>
+          <div class="card mb-3" data-section="Mieten">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0832</span>Mieten</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addSachRow('Mieten')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadMieten"></thead><tbody id="tbodyMieten"></tbody><tfoot class="table-warning" id="tfootMieten"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfMieten" placeholder="Begr&uuml;ndung Mieten..." maxlength="2000" onchange="FP.rpfBegruendung.Mieten=this.value"></textarea></div>
+          </div>
+          <div class="card mb-3" data-section="Rechner">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0833</span>Rechner</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addSachRow('Rechner')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadRechner"></thead><tbody id="tbodyRechner"></tbody><tfoot class="table-warning" id="tfootRechner"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfRechner" placeholder="Begr&uuml;ndung Rechner..." maxlength="2000" onchange="FP.rpfBegruendung.Rechner=this.value"></textarea></div>
+          </div>
+          <div class="card mb-3" data-section="Auftrag">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0835</span>Vergabe von Auftr&auml;gen</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addAuftragRow()"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadAuftrag"></thead><tbody id="tbodyAuftrag"></tbody><tfoot class="table-warning" id="tfootAuftrag"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label"><span class="form-code">U07</span>Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfAuftrag" placeholder="Begr&uuml;ndung Vergabe von Auftr&auml;gen..." maxlength="2000" onchange="FP.rpfBegruendung.Auftrag=this.value"></textarea></div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="card mb-3" data-section="Verbrauchsmaterial">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0838</span>Verbrauchsmaterial</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addSachRow('Verbrauchsmaterial')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadVerbrauchsmaterial"></thead><tbody id="tbodyVerbrauchsmaterial"></tbody><tfoot class="table-warning" id="tfootVerbrauchsmaterial"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfVerbrauchsmaterial" placeholder="Begr&uuml;ndung Verbrauchsmaterial..." maxlength="2000" onchange="FP.rpfBegruendung.Verbrauchsmaterial=this.value"></textarea></div>
+          </div>
+          <div class="card mb-3" data-section="Geschaeftsbedarf">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0839</span>Gesch&auml;ftsbedarf</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addSachRow('Geschaeftsbedarf')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadGeschaeftsbedarf"></thead><tbody id="tbodyGeschaeftsbedarf"></tbody><tfoot class="table-warning" id="tfootGeschaeftsbedarf"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfGeschaeftsbedarf" placeholder="Begr&uuml;ndung Gesch&auml;ftsbedarf..." maxlength="2000" onchange="FP.rpfBegruendung.Geschaeftsbedarf=this.value"></textarea></div>
+          </div>
+          <div class="card mb-3" data-section="Literatur">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0840</span>Literatur</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addSachRow('Literatur')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadLiteratur"></thead><tbody id="tbodyLiteratur"></tbody><tfoot class="table-warning" id="tfootLiteratur"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfLiteratur" placeholder="Begr&uuml;ndung Literatur..." maxlength="2000" onchange="FP.rpfBegruendung.Literatur=this.value"></textarea></div>
+          </div>
+          <div class="card mb-3" data-section="ZusatzMaterial1">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0841</span>Zusatzmaterial 1 <input type="text" class="form-control form-control-sm d-inline-block w-auto ms-2" data-field="Bezeichnung_ZusatzMaterial1" maxlength="50" placeholder="Bezeichnung"></h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addSachRow('ZusatzMaterial1')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadZusatzMaterial1"></thead><tbody id="tbodyZusatzMaterial1"></tbody><tfoot class="table-warning" id="tfootZusatzMaterial1"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfZusatzMaterial1" placeholder="Begr&uuml;ndung Zusatzmaterial 1..." maxlength="2000" onchange="FP.rpfBegruendung.ZusatzMaterial1=this.value"></textarea></div>
+          </div>
+          <div class="card mb-3" data-section="ZusatzMaterial2">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0842</span>Zusatzmaterial 2 <input type="text" class="form-control form-control-sm d-inline-block w-auto ms-2" data-field="Bezeichnung_ZusatzMaterial2" maxlength="50" placeholder="Bezeichnung"></h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addSachRow('ZusatzMaterial2')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadZusatzMaterial2"></thead><tbody id="tbodyZusatzMaterial2"></tbody><tfoot class="table-warning" id="tfootZusatzMaterial2"></tfoot></table></div>
+            <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfZusatzMaterial2" placeholder="Begr&uuml;ndung Zusatzmaterial 2..." maxlength="2000" onchange="FP.rpfBegruendung.ZusatzMaterial2=this.value"></textarea></div>
+          </div>
+          <div class="card mb-3" data-section="Inlandreisen">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0844</span>Inlandsreisen</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addReisenRow('Inlandreisen')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadInlandreisen"></thead><tbody id="tbodyInlandreisen"></tbody><tfoot class="table-warning" id="tfootInlandreisen"></tfoot></table></div>
+            <div class="card-footer">
+              <label class="form-label">Begr&uuml;ndung Reisekosten (rpf)</label>
+              <textarea class="form-control" rows="2" id="rpfInlandreisen" placeholder="Begr&uuml;ndung Inlandsreisen..." maxlength="2000" onchange="FP.rpfBegruendung.Inlandreisen=this.value"></textarea>
+            </div>
+          </div>
+          <div class="card mb-3" data-section="Auslandreisen">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><span class="form-code">F0845</span>Auslandsreisen</h6>
+              <button class="btn btn-success btn-sm" onclick="FP.addReisenRow('Auslandreisen')"><i class="bi bi-plus-circle"></i></button>
+            </div>
+            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadAuslandreisen"></thead><tbody id="tbodyAuslandreisen"></tbody><tfoot class="table-warning" id="tfootAuslandreisen"></tfoot></table></div>
+            <div class="card-footer">
+              <label class="form-label">Begr&uuml;ndung Reisekosten (rpf)</label>
+              <textarea class="form-control" rows="2" id="rpfAuslandreisen" placeholder="Begr&uuml;ndung Auslandsreisen..." maxlength="2000" onchange="FP.rpfBegruendung.Auslandreisen=this.value"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3" data-section="GesamteInvestitionen">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><span class="form-code">F0850</span>Investitionen</h6>
+          <button class="btn btn-success btn-sm" onclick="FP.addInvestRow()"><i class="bi bi-plus-circle"></i></button>
+        </div>
+        <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadGesamteInvestitionen"></thead><tbody id="tbodyGesamteInvestitionen"></tbody><tfoot class="table-warning" id="tfootGesamteInvestitionen"></tfoot></table></div>
+        <div class="card-footer">
+          <label class="form-label">Begr&uuml;ndung Investitionen (rpf)</label>
+          <textarea class="form-control" rows="2" id="rpfGesamteInvestitionen" placeholder="Begr&uuml;ndung Investitionen..." maxlength="2000" onchange="FP.rpfBegruendung.GesamteInvestitionen=this.value"></textarea>
+        </div>
+      </div>
+
+      <div class="card mb-3 border-dark">
+        <div class="card-header bg-dark text-white"><h6 class="mb-0"><span class="form-code">F0861</span>Ausgaben Gesamt&uuml;bersicht</h6></div>
+        <div class="card-body"><table class="table table-sm table-bordered mb-0" id="tableAusgabenGesamt"><thead class="table-dark"><tr id="theadAusgabenGesamt"></tr></thead><tbody id="tbodyAusgabenGesamt"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 6: FINANZIERUNG ==================== -->
+    <div class="tab-pane fade" id="tabFinanzierung" role="tabpanel">
+      <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0"><span class="form-code">F0863</span>Mittel Dritter</h6>
+          <button class="btn btn-success btn-sm" onclick="FP.addMittelDritterRow()"><i class="bi bi-plus-circle"></i> Zeile</button>
+        </div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm table-bordered" id="tableMittelDritter">
+            <thead class="table-light" id="theadMittelDritter"></thead>
+            <tbody id="tbodyMittelDritter"></tbody>
+            <tfoot class="table-warning" id="tfootMittelDritter"></tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header"><h6 class="mb-0"><span class="form-code">F0000</span>Finanzierung&uuml;bersicht</h6></div>
+        <div class="card-body table-responsive">
+          <table class="table table-sm table-bordered" id="tableFinanzierung">
+            <thead class="table-primary" id="theadFinanzierung"></thead>
+            <tbody id="tbodyFinanzierung"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-header"><h6 class="mb-0">Einstellungen</h6></div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">Projektpauschale Satz (%)</label>
+              <input type="number" class="form-control" id="ppSatz" value="20" min="0" max="100">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Strategie</label>
+              <select class="form-select" id="finStrategie" data-field="Strategie_EP">
+                <option value="Zuwendung">Zuwendung</option>
+                <option value="Eigenmittel">Eigenmittel</option>
+                <option value="F&ouml;rderquote" selected>F&ouml;rderquote</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <div class="form-check mt-4">
+                <input class="form-check-input" type="checkbox" id="chkStrategieWaehlbar" checked>
+                <label class="form-check-label" for="chkStrategieWaehlbar">Strategie w&auml;hlbar</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 7: ERKLAERUNGEN ==================== -->
+    <div class="tab-pane fade" id="tabErklaerungen" role="tabpanel">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Erkl&auml;rungen und Pflichtanlagen</h6></div>
+            <div class="card-body">
+              <div class="row g-2">
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Vorhabenbeschreibung" id="chkVB"><label class="form-check-label" for="chkVB">Vorhabenbeschreibung *</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Balkenplan" id="chkBP"><label class="form-check-label" for="chkBP">Balkenplan *</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Strukturplan" id="chkSP"><label class="form-check-label" for="chkSP">Strukturplan</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Netzplan" id="chkNP"><label class="form-check-label" for="chkNP">Netzplan</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Vorkalkulationsdaten" id="chkVK"><label class="form-check-label" for="chkVK">Erl&auml;uterung des Finanzierungsplans</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Geraeteliste" id="chkGL"><label class="form-check-label" for="chkGL">Ger&auml;teliste</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Bonitaetsnachweis" id="chkBN"><label class="form-check-label" for="chkBN">Bonit&auml;tsnachweis</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Zeichnungen" id="chkZE"><label class="form-check-label" for="chkZE">Zeichnungen</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Mitfinanzierung" id="chkMF"><label class="form-check-label" for="chkMF">Mitfinanzierung</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Eigenmittel_vorhanden" id="chkEM"><label class="form-check-label" for="chkEM">Eigenmittel vorhanden</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Personal_investition" id="chkPI"><label class="form-check-label" for="chkPI">Personalausgaben</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="GeguInvest" id="chkGI"><label class="form-check-label" for="chkGI">Gegenst&auml;nde und Investitionen</label></div></div>
+                <div class="col-md-6">
+                  <div class="form-check"><input class="form-check-input" type="checkbox" data-field="Folgekosten" id="chkFK"><label class="form-check-label" for="chkFK">Werden durch das Vorhaben weitere Ausgaben entstehen?</label></div>
+                  <div class="row g-2 mt-1 ms-3" id="folgekostenDetails" style="display:none">
+                    <div class="col-12"><label class="form-label"><span class="form-code">E41</span>H&ouml;he der Folgeausgaben</label><input type="text" class="form-control form-control-sm" data-field="Folgekosten_Betrag"></div>
+                    <div class="col-12"><label class="form-label"><span class="form-code">E42</span>Art und Tr&auml;ger/in</label><input type="text" class="form-control form-control-sm" data-field="Folgekosten_Beschreibung" maxlength="45"></div>
+                  </div>
+                </div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Grundfinanzierung" id="chkGF"><label class="form-check-label" for="chkGF">Grundfinanzierung</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Einvernehmen_mit_Landesressort" id="chkEL"><label class="form-check-label" for="chkEL">Einvernehmen mit Landesressort</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="subventionserheblicheTatsachen" id="chkSU"><label class="form-check-label" for="chkSU">Subventionserhebliche Tatsachen</label></div></div>
+                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Einverstaendnis_Vollstaendigkeit" id="chkEV"><label class="form-check-label" for="chkEV">Vollst&auml;ndigkeit und Einverst&auml;ndnis</label></div></div>
+              </div>
+              <hr>
+              <div class="mb-3">
+                <label class="form-label">Sonstige F&ouml;rderung</label>
+                <select class="form-select" data-field="Sonstige_Foerderung" id="selSonstFoerd">
+                  <option value="Das Vorhaben ist oder wird nicht anderweitig mit Zuwendung oder Auftrag &ouml;ffentlich finanziert.">Nicht anderweitig &ouml;ffentlich finanziert</option>
+                  <option value="Das Vorhaben ist oder wird anderweitig mit Zuwendung oder Auftrag &ouml;ffentlich finanziert.">Anderweitig &ouml;ffentlich finanziert</option>
+                </select>
+                <div class="row g-2 mt-1" id="sonstFoerdDetails" style="display:none">
+                  <div class="col-md-8"><label class="form-label"><span class="form-code">E35</span>Tr&auml;ger und Art</label><input type="text" class="form-control" data-field="Traeger_sonstige_Foerderung" maxlength="120"></div>
+                  <div class="col-md-4"><label class="form-label"><span class="form-code">E36</span>H&ouml;he (EUR)</label><input type="text" class="form-control" data-field="sonstige_Foerderung_Betrag"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Wirtschaftlicher Bereich</label>
+                <select class="form-select" data-field="wirtschaftlichen_Bereich_J_N_N">
+                  <option value="(trifft nicht auf den Antragsteller zu)">(trifft nicht auf den Antragsteller zu)</option>
+                  <option value="f&uuml;r den nicht-wirtschaftlichen Bereich">f&uuml;r den nicht-wirtschaftlichen Bereich</option>
+                  <option value="f&uuml;r den wirtschaftlichen Bereich">f&uuml;r den wirtschaftlichen Bereich</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Zusatzinformationen</h6></div>
+            <div class="card-body">
+              <div class="form-check mb-2"><input class="form-check-input" type="checkbox" data-field="KMU_Status" id="chkKMU"><label class="form-check-label" for="chkKMU">Unternehmen in Schwierigkeiten</label></div>
+              <div class="form-check mb-2"><input class="form-check-input" type="checkbox" data-field="KeinUnternehmen" id="chkKU"><label class="form-check-label" for="chkKU">Leibniz-Institut oder &auml;hnliche Einrichtung/Verein</label></div>
+            </div>
+          </div>
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">profi-Online Zugang</h6></div>
+            <div class="card-body">
+              <table class="table table-sm table-bordered" id="tableProfiOnline">
+                <thead class="table-light">
+                  <tr><th>Rolle</th><th>Name</th><th>E-Mail</th><th>Zugang</th></tr>
+                </thead>
+                <tbody id="tbodyProfiOnline"></tbody>
+              </table>
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" data-field="AntragOnlineZugang" id="chkAOZ" checked>
+                <label class="form-check-label" for="chkAOZ">Antrag Online-Zugang</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-content -->
+</div><!-- /container -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/de.js"></script>
+<script src="js/app.js"></script>
+<script src="js/finanzplan.js"></script>
+<script src="js/xml-export.js"></script>
+<script src="js/xml-import.js"></script>
+</body>
+</html>
