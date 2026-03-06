@@ -15,7 +15,11 @@
 <nav class="navbar navbar-dark bg-primary sticky-top">
   <div class="container-fluid">
     <span class="navbar-brand mb-0 h1"><i class="bi bi-file-earmark-text"></i> easy-Online Offline <small class="text-white-50">AZAP</small></span>
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 align-items-center">
+      <div class="position-relative" id="searchWrap">
+        <input type="text" class="form-control form-control-sm" id="fieldSearch" placeholder="Feld suchen..." autocomplete="off" style="width:180px;font-size:.8rem;">
+        <div class="dropdown-menu" id="searchResults" style="max-height:300px;overflow-y:auto;font-size:.8rem;"></div>
+      </div>
       <button class="btn btn-outline-light btn-sm" id="btnImportXml"><i class="bi bi-upload"></i> XML Import</button>
       <button class="btn btn-warning btn-sm" id="btnExportXml"><i class="bi bi-download"></i> XML Export</button>
       <button class="btn btn-outline-light btn-sm" id="btnClearAll"><i class="bi bi-trash"></i> Neu</button>

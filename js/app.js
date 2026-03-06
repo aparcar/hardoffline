@@ -426,6 +426,7 @@ const App = {
     this.toggleErklaerungen();
     this.updateProfiOnlineTable();
     this.initCharCounters();
+    this.initFieldSearch();
     this.startAutoSave();
   },
 
@@ -707,6 +708,97 @@ const App = {
 
   startAutoSave() {
     setInterval(() => this.saveToStorage(), 30000);
+  },
+
+  // ---- Field search ----
+  initFieldSearch() {
+    const input = document.getElementById('fieldSearch');
+    const dropdown = document.getElementById('searchResults');
+    if (!input || !dropdown) return;
+
+    // Build index of searchable fields and sections
+    this._fieldIndex = [];
+    // Index data-field elements
+    document.querySelectorAll('[data-field]').forEach(el => {
+      const code = el.getAttribute('data-field');
+      let label = '';
+      const lbl = el.closest('.col-md-12, .col-md-4, .col-md-6, .col-md-8, .col-lg-6, .col-lg-8, .col-lg-4, .col-md-3, .col-lg-3, .col-md-2')?.querySelector('.form-label');
+      if (lbl) label = lbl.textContent.trim();
+      if (!label) {
+        const prev = el.previousElementSibling;
+        if (prev && prev.classList?.contains('form-label')) label = prev.textContent.trim();
+      }
+      if (!label) {
+        const p = el.closest('label');
+        if (p) label = p.textContent.trim();
+      }
+      this._fieldIndex.push({ code, label, el });
+    });
+    // Index form-code sections (card headers, section labels)
+    document.querySelectorAll('.form-code').forEach(span => {
+      const code = span.textContent.trim();
+      const parent = span.closest('h6, .form-label');
+      const label = parent ? parent.textContent.replace(code, '').trim() : '';
+      // Labels inside form fields → jump to the field's container row
+      // Card headers → jump to the card
+      let target;
+      if (span.closest('.form-label')) {
+        target = span.closest('.form-label').parentElement || span;
+      } else if (span.closest('.card-header')) {
+        target = span.closest('.card') || span.closest('.card-header').parentElement;
+      } else {
+        target = span.closest('.card') || span.parentElement || span;
+      }
+      this._fieldIndex.push({ code, label, el: target });
+    });
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      if (q.length < 1) { dropdown.classList.remove('show'); return; }
+      const matches = this._fieldIndex.filter(f =>
+        f.code.toLowerCase().includes(q) || f.label.toLowerCase().includes(q)
+      ).slice(0, 15);
+      if (matches.length === 0) { dropdown.classList.remove('show'); return; }
+      dropdown.innerHTML = matches.map((m, i) =>
+        `<button class="dropdown-item" type="button" data-idx="${i}"><code>${m.code}</code> <span class="text-muted">${m.label}</span></button>`
+      ).join('');
+      dropdown.classList.add('show');
+      dropdown.querySelectorAll('.dropdown-item').forEach((btn, i) => {
+        btn.addEventListener('click', () => {
+          this.jumpToField(matches[i]);
+          input.value = '';
+          dropdown.classList.remove('show');
+        });
+      });
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { input.value = ''; dropdown.classList.remove('show'); }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#searchWrap')) dropdown.classList.remove('show');
+    });
+  },
+
+  jumpToField(match) {
+    const el = match.el;
+    // Find which tab-pane this element is in
+    const pane = el.closest('.tab-pane');
+    if (pane) {
+      const tabLink = document.querySelector(`a[href="#${pane.id}"]`);
+      if (tabLink) new bootstrap.Tab(tabLink).show();
+    }
+    // Small delay to let tab switch render
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Focus if it's an input/select/textarea, otherwise just highlight
+      if (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') {
+        el.focus();
+      }
+      el.classList.add('search-highlight');
+      setTimeout(() => el.classList.remove('search-highlight'), 1500);
+    }, 150);
   },
 
   showSaveStatus(text, dirty) {
