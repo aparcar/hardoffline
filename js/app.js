@@ -714,9 +714,15 @@ const App = {
     if (dirty) {
       el.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${text}`;
       el.className = 'badge bg-danger align-self-center';
+      el.style.cursor = 'pointer';
+      el.title = 'Klicken zum Speichern';
+      el.onclick = () => this.saveToStorage();
     } else {
       el.innerHTML = `<i class="bi bi-check-circle"></i> ${text}`;
       el.className = 'badge bg-light text-dark align-self-center';
+      el.style.cursor = 'default';
+      el.title = '';
+      el.onclick = null;
     }
   },
 
