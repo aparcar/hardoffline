@@ -25,6 +25,11 @@ const XmlImport = {
     App.updateJahre();
     App.updateProfiOnlineTable();
     App.saveToStorage();
+
+    // Snapshot baseline for diff view
+    if (!Diff._suppressBaseline) {
+      Diff.setBaseline(Diff.captureSnapshot());
+    }
   },
 
   // --- Helper: get text content of an xf: element ---
@@ -184,7 +189,8 @@ const XmlImport = {
           plz: this.xfText(tp, 'PLZ_Strasse_KO'),
           ort: this.xfText(tp, 'Ort_Strasse_KO'),
           land: this.xfText(tp, 'Land_KO') || 'Deutschland',
-          rolle: this.xfText(tp, 'Rolle') || 'Mitglied der Arbeitsgemeinschaft'
+          rolle: this.xfText(tp, 'Rolle') || 'Mitglied der Arbeitsgemeinschaft',
+          fkz: this.xfText(tp, 'Foerderkennzeichen_KO')
         });
       });
     }
@@ -558,49 +564,34 @@ const XmlImport = {
     const maske = this.xfFirst(doc, maskeName);
     if (!maske) return;
 
-    const tabPos = this.xfAll(maske, 'Tabellenposition');
-    const rowMap = {}; // tabID -> { reiseziel, reisezweck, reisedauer, entries: { jahr: amount } }
+    FP.reisen[section] = {};
 
+    const tabPos = this.xfAll(maske, 'Tabellenposition');
     tabPos.forEach(tp => {
       const jahr = tp.getAttribute('xf:Jahr');
-      const tabId = tp.getAttribute('xf:TabID');
-      if (!tabId) return;
+      if (!jahr || jahr === 'Gesamt') return;
 
-      if (!rowMap[tabId]) {
-        rowMap[tabId] = {
-          reiseziel: this.xfText(tp, 'Reiseziel'),
-          reisezweck: this.xfText(tp, 'Reisezweck'),
-          reisedauer: App.parseNum(this.xfText(tp, 'Reisedauer')) || 1,
-          entries: {}
-        };
-      }
-      rowMap[tabId].entries[jahr] = App.parseNum(this.xfText(tp, 'BetragSumme'));
-    });
-
-    const sortedIds = Object.keys(rowMap).sort((a, b) => parseInt(a) - parseInt(b));
-    sortedIds.forEach(tabId => {
-      const data = rowMap[tabId];
-      jahre.forEach(j => { if (data.entries[j] === undefined) data.entries[j] = 0; });
-      FP.addReisenRow(section, data);
+      const betrag = App.parseNum(this.xfText(tp, 'BetragSumme'));
+      FP.addReisenRow(section, jahr, {
+        reiseziel: this.xfText(tp, 'Reiseziel'),
+        reisezweck: this.xfText(tp, 'Reisezweck'),
+        reisedauer: App.parseNum(this.xfText(tp, 'Reisedauer')) || 1,
+        betrag: betrag
+      });
     });
 
     // If no Tabellenposition, fall back to Zwischensumme
     if (tabPos.length === 0) {
       const zwi = this.xfAll(maske, 'Zwischensumme');
-      const entries = {};
-      let hasAny = false;
       zwi.forEach(z => {
         const jahr = z.getAttribute('xf:Jahr');
         if (jahr && jahr !== 'Gesamt') {
           const val = App.parseNum(this.xfText(z, 'BetragSumme'));
-          entries[jahr] = val;
-          if (val !== 0) hasAny = true;
+          if (val !== 0) {
+            FP.addReisenRow(section, jahr, { reiseziel: '', reisezweck: '', reisedauer: 1, betrag: val });
+          }
         }
       });
-      if (hasAny) {
-        jahre.forEach(j => { if (entries[j] === undefined) entries[j] = 0; });
-        FP.addReisenRow(section, { reiseziel: '', reisezweck: '', reisedauer: 1, entries });
-      }
     }
 
     // Import rpf_Begruendung

@@ -8,8 +8,8 @@ const FP = {
   personal: { tarif1: [], tarif2: [], tarif3: [] },
   // Material data: { Gegenstaende: [{id, bezeichnung, entries: {2026: amount, ...}}], ... }
   sach: {},
-  // Reisen data: { Inlandreisen: [{id, reiseziel, reisezweck, reisedauer, entries: {2026: amount, ...}}], ... }
-  reisen: { Inlandreisen: [], Auslandreisen: [] },
+  // Reisen data: { Inlandreisen: { '2026': [{id, reiseziel, reisezweck, reisedauer, betrag}], ... }, ... }
+  reisen: { Inlandreisen: {}, Auslandreisen: {} },
   // Investitionen: [{id, bezeichnung, entries: {2026: {preis, anzahl}, ...}}]
   invest: [],
   // Financing: { mittelDritter: {2026: 0, ...}, eigenmittel: {2026: 0, ...} }
@@ -484,61 +484,73 @@ const FP = {
   },
 
   // ============== REISEN (Travel) ==============
-  addReisenRow(section, data) {
+  addReisenRow(section, jahr, data) {
     const jahre = App.jahre;
     if (jahre.length === 0) { alert('Bitte zuerst Projektlaufzeit eingeben.'); return; }
+    if (!jahr) jahr = jahre[0];
+    if (!this.reisen[section]) this.reisen[section] = {};
+    if (!this.reisen[section][jahr]) this.reisen[section][jahr] = [];
     const row = {
       id: data?.id || this.genId(),
       reiseziel: data?.reiseziel || '',
       reisezweck: data?.reisezweck || '',
       reisedauer: data?.reisedauer || 1,
-      entries: {}
+      betrag: data?.betrag || 0
     };
-    jahre.forEach(j => { row.entries[j] = data?.entries?.[j] || 0; });
-    this.reisen[section].push(row);
+    this.reisen[section][jahr].push(row);
     this.renderReisenTable(section);
+    this.saveToStorage();
     return row;
   },
 
-  removeReisenRow(section, id) {
-    this.reisen[section] = this.reisen[section].filter(r => r.id !== id);
+  removeReisenRow(section, jahr, id) {
+    if (this.reisen[section]?.[jahr]) {
+      this.reisen[section][jahr] = this.reisen[section][jahr].filter(r => r.id !== id);
+    }
     this.renderReisenTable(section);
+    this.saveToStorage();
   },
 
   renderReisenTable(section) {
     const jahre = App.jahre;
-    const thead = document.getElementById(`thead${section}`);
-    const tbody = document.getElementById(`tbody${section}`);
-    const tfoot = document.getElementById(`tfoot${section}`);
-    if (!thead) return;
+    const container = document.getElementById(`reisen${section}`);
+    if (!container) return;
 
-    thead.innerHTML = '<tr><th>Reiseziel</th><th>Zweck</th><th>Tage</th>' + jahre.map(j => `<th class="text-end">${j}</th>`).join('') + '<th class="text-end">Gesamt</th><th></th></tr>';
+    const sectionData = this.reisen[section] || {};
+    let html = '';
 
-    tbody.innerHTML = this.reisen[section].map(row => {
-      let html = `<tr>`;
-      html += `<td><input class="form-control fp-input-wide" maxlength="50" value="${this.esc(row.reiseziel)}" onchange="FP.updateReisenField('${section}',${row.id},'reiseziel',this.value)"></td>`;
-      html += `<td><input class="form-control fp-input-wide" maxlength="50" value="${this.esc(row.reisezweck)}" onchange="FP.updateReisenField('${section}',${row.id},'reisezweck',this.value)"></td>`;
-      html += `<td><input type="number" class="form-control fp-input-narrow" value="${row.reisedauer}" onchange="FP.updateReisenField('${section}',${row.id},'reisedauer',this.value)"></td>`;
-      let total = 0;
-      jahre.forEach(j => {
-        const v = App.parseNum(row.entries[j]);
-        total += v;
-        html += `<td><input type="number" step="0.01" class="form-control fp-input" value="${v}" onchange="FP.updateReisenEntry('${section}',${row.id},'${j}',this.value)"></td>`;
-      });
-      html += `<td class="fp-calculated text-end">${App.fmt(total)}</td>`;
-      html += `<td><button class="btn btn-danger btn-del-row" onclick="FP.removeReisenRow('${section}',${row.id})"><i class="bi bi-x"></i></button></td></tr>`;
-      return html;
-    }).join('');
-
-    let foot = '<tr class="fp-total"><td colspan="3" class="text-end"><strong>Summe</strong></td>';
-    let grandTotal = 0;
+    // Per-year tables
     jahre.forEach(j => {
-      const s = this.yearSubtotalReisen(section, j);
-      grandTotal += s;
-      foot += `<td class="text-end"><strong>${App.fmt(s)}</strong></td>`;
+      const rows = sectionData[j] || [];
+      html += `<div class="mb-2">`;
+      html += `<div class="d-flex justify-content-between align-items-center mb-1">`;
+      html += `<strong class="small">${j}</strong>`;
+      html += `<button class="btn btn-outline-success btn-sm" style="padding:0 5px;font-size:.7rem;" onclick="FP.addReisenRow('${section}','${j}')"><i class="bi bi-plus"></i></button>`;
+      html += `</div>`;
+      html += `<table class="table table-sm table-bordered mb-0"><thead class="table-light"><tr><th>Reiseziel</th><th>Zweck</th><th>Tage</th><th class="text-end">Betrag</th><th></th></tr></thead><tbody>`;
+      if (rows.length === 0) {
+        html += `<tr><td colspan="5" class="text-muted text-center small">Keine Eintr&auml;ge</td></tr>`;
+      } else {
+        rows.forEach(row => {
+          html += `<tr>`;
+          html += `<td><input class="form-control form-control-sm" maxlength="50" value="${this.esc(row.reiseziel)}" onchange="FP.updateReisenField('${section}','${j}',${row.id},'reiseziel',this.value)"></td>`;
+          html += `<td><input class="form-control form-control-sm" maxlength="50" value="${this.esc(row.reisezweck)}" onchange="FP.updateReisenField('${section}','${j}',${row.id},'reisezweck',this.value)"></td>`;
+          html += `<td><input type="number" class="form-control form-control-sm fp-input-narrow" value="${row.reisedauer}" onchange="FP.updateReisenField('${section}','${j}',${row.id},'reisedauer',this.value)"></td>`;
+          html += `<td><input type="number" step="0.01" class="form-control form-control-sm fp-input" value="${App.parseNum(row.betrag)}" onchange="FP.updateReisenField('${section}','${j}',${row.id},'betrag',this.value)"></td>`;
+          html += `<td><button class="btn btn-danger btn-del-row" onclick="FP.removeReisenRow('${section}','${j}',${row.id})"><i class="bi bi-x"></i></button></td></tr>`;
+        });
+      }
+      const yearTotal = rows.reduce((s, r) => s + App.parseNum(r.betrag), 0);
+      html += `</tbody><tfoot class="table-warning"><tr><td colspan="3" class="text-end"><strong>Summe ${j}</strong></td><td class="text-end"><strong>${App.fmt(yearTotal)}</strong></td><td></td></tr></tfoot></table>`;
+      html += `</div>`;
     });
-    foot += `<td class="text-end"><strong>${App.fmt(grandTotal)}</strong></td><td></td></tr>`;
-    tfoot.innerHTML = foot;
+
+    // Grand total
+    let grandTotal = 0;
+    jahre.forEach(j => { grandTotal += this.yearSubtotalReisen(section, j); });
+    html += `<div class="text-end fp-grand-total p-1 rounded small">Gesamt: ${App.fmt(grandTotal)}</div>`;
+
+    container.innerHTML = html;
 
     // Restore rpf textarea
     const rpfEl = document.getElementById(`rpf${section}`);
@@ -548,18 +560,18 @@ const FP = {
     this.renderFinanzierung();
   },
 
-  updateReisenField(section, id, field, value) {
-    const row = this.reisen[section].find(r => r.id === id);
-    if (row) { row[field] = (field === 'reisedauer') ? App.parseNum(value) : value; }
-  },
-
-  updateReisenEntry(section, id, jahr, value) {
-    const row = this.reisen[section].find(r => r.id === id);
-    if (row) { row.entries[jahr] = App.parseNum(value); this.renderReisenTable(section); }
+  updateReisenField(section, jahr, id, field, value) {
+    const rows = this.reisen[section]?.[jahr] || [];
+    const row = rows.find(r => r.id === id);
+    if (row) {
+      row[field] = (field === 'reisedauer' || field === 'betrag') ? App.parseNum(value) : value;
+      if (field === 'betrag') this.renderReisenTable(section);
+      this.saveToStorage();
+    }
   },
 
   yearSubtotalReisen(section, jahr) {
-    return this.reisen[section].reduce((s, r) => s + App.parseNum(r.entries[jahr]), 0);
+    return (this.reisen[section]?.[jahr] || []).reduce((s, r) => s + App.parseNum(r.betrag), 0);
   },
 
   // ============== INVESTITIONEN ==============
@@ -737,7 +749,8 @@ const FP = {
       plz: data?.plz || '',
       ort: data?.ort || '',
       land: data?.land || 'Deutschland',
-      rolle: data?.rolle || 'Mitglied der Arbeitsgemeinschaft'
+      rolle: data?.rolle || 'Mitglied der Arbeitsgemeinschaft',
+      fkz: data?.fkz || ''
     };
     this.kopiPartner.push(row);
     this.renderKopiTable();
@@ -772,6 +785,7 @@ const FP = {
           `<option value="Geschäftsführung / Federführung der Arbeitsgemeinschaft"${selGF}>Federführung</option>` +
           `<option value="Mitglied der Arbeitsgemeinschaft"${selMA}>Mitglied</option>` +
         `</select></td>` +
+        `<td><input class="form-control form-control-sm" style="width:130px" value="${this.esc(row.fkz)}" onchange="FP.updateKopiField(${row.id},'fkz',this.value)"></td>` +
         `<td><button class="btn btn-danger btn-del-row" onclick="FP.removeKopiRow(${row.id})"><i class="bi bi-x"></i></button></td></tr>`;
     }).join('');
   },
@@ -946,9 +960,7 @@ const FP = {
     });
     this.renderAuftragTable();
     ['Inlandreisen','Auslandreisen'].forEach(s => {
-      this.reisen[s].forEach(row => {
-        App.jahre.forEach(j => { if (row.entries[j] === undefined) row.entries[j] = 0; });
-      });
+      if (!this.reisen[s] || Array.isArray(this.reisen[s])) this.reisen[s] = {};
       this.renderReisenTable(s);
     });
     this.invest.forEach(row => {
@@ -996,7 +1008,24 @@ const FP = {
       if (d.sonstigeEntgelte) this.sonstigeEntgelte = d.sonstigeEntgelte;
       if (d.sach) this.sach = d.sach;
       if (d.auftrag) this.auftrag = d.auftrag;
-      if (d.reisen) this.reisen = d.reisen;
+      if (d.reisen) {
+        // Migrate old array-based format to per-year format
+        ['Inlandreisen', 'Auslandreisen'].forEach(s => {
+          if (Array.isArray(d.reisen[s])) {
+            const perYear = {};
+            d.reisen[s].forEach(row => {
+              Object.entries(row.entries || {}).forEach(([j, amt]) => {
+                if (App.parseNum(amt) !== 0) {
+                  if (!perYear[j]) perYear[j] = [];
+                  perYear[j].push({ id: row.id || this.genId(), reiseziel: row.reiseziel || '', reisezweck: row.reisezweck || '', reisedauer: row.reisedauer || 1, betrag: App.parseNum(amt) });
+                }
+              });
+            });
+            d.reisen[s] = perYear;
+          }
+        });
+        this.reisen = d.reisen;
+      }
       if (d.invest) this.invest = d.invest;
       if (d.finanz) this.finanz = d.finanz;
       if (d.rpfBegruendung) this.rpfBegruendung = d.rpfBegruendung;

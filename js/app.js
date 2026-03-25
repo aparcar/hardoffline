@@ -427,6 +427,7 @@ const App = {
     this.updateProfiOnlineTable();
     this.initCharCounters();
     this.initFieldSearch();
+    this.initDiff();
     this.startAutoSave();
   },
 
@@ -554,6 +555,7 @@ const App = {
       if (confirm('Alle Daten löschen und neu beginnen?')) {
         localStorage.removeItem('eoFormData');
         localStorage.removeItem('eoFinanzplan');
+        localStorage.removeItem('eoDiffBaseline');
         location.reload();
       }
     });
@@ -708,6 +710,114 @@ const App = {
 
   startAutoSave() {
     setInterval(() => this.saveToStorage(), 30000);
+  },
+
+  // ---- Diff view ----
+  initDiff() {
+    Diff.loadBaseline();
+
+    // Re-render diff when tab is shown
+    const tabLink = document.getElementById('tabDiffLink');
+    if (tabLink) {
+      tabLink.addEventListener('shown.bs.tab', () => Diff.renderDiff());
+    }
+
+    // Mode toggle
+    document.querySelectorAll('input[name="diffMode"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        Diff.mode = radio.value;
+        const uploadBtn = document.getElementById('btnUploadComparison');
+        const fileName = document.getElementById('comparisonFileName');
+        if (radio.value === 'comparison') {
+          uploadBtn?.classList.remove('d-none');
+          if (Diff.comparison) fileName?.classList.remove('d-none');
+        } else {
+          uploadBtn?.classList.add('d-none');
+          fileName?.classList.add('d-none');
+        }
+        Diff.renderDiff();
+      });
+    });
+
+    // Comparison file upload
+    const btnUpload = document.getElementById('btnUploadComparison');
+    const fileInput = document.getElementById('fileInputComparison');
+    if (btnUpload && fileInput) {
+      btnUpload.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          // Parse comparison XML into a temporary snapshot
+          const snap = this.importXmlToSnapshot(ev.target.result);
+          if (snap) {
+            Diff.setComparison(snap);
+            const fileName = document.getElementById('comparisonFileName');
+            if (fileName) {
+              fileName.textContent = file.name;
+              fileName.classList.remove('d-none');
+            }
+            Diff.renderDiff();
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+    }
+  },
+
+  // Import XML into a snapshot without affecting current form state
+  importXmlToSnapshot(xmlString) {
+    // Save current state
+    const savedFormData = {};
+    document.querySelectorAll('[data-field]').forEach(el => {
+      const key = el.getAttribute('data-field');
+      if (el.type === 'checkbox') savedFormData[key] = el.checked;
+      else savedFormData[key] = el.value;
+    });
+    const savedFP = JSON.parse(JSON.stringify({
+      personal: FP.personal, sonstigeEntgelte: FP.sonstigeEntgelte,
+      sach: FP.sach, auftrag: FP.auftrag, reisen: FP.reisen,
+      invest: FP.invest, finanz: FP.finanz, rpfBegruendung: FP.rpfBegruendung,
+      mittelDritterRows: FP.mittelDritterRows, kopiPartner: FP.kopiPartner,
+      _nextId: FP._nextId
+    }));
+    const savedJahre = [...this.jahre];
+    const savedBaseline = Diff.baseline;
+
+    // Import into form temporarily
+    Diff._suppressBaseline = true;
+    XmlImport.importXml(xmlString);
+    Diff._suppressBaseline = false;
+
+    // Capture snapshot of imported data
+    const snapshot = Diff.captureSnapshot();
+
+    // Restore original state
+    Object.entries(savedFormData).forEach(([key, val]) => {
+      const el = document.querySelector(`[data-field="${key}"]`);
+      if (!el) return;
+      if (el.type === 'checkbox') el.checked = !!val;
+      else el.value = val || '';
+    });
+    FP.personal = savedFP.personal;
+    FP.sonstigeEntgelte = savedFP.sonstigeEntgelte;
+    FP.sach = savedFP.sach;
+    FP.auftrag = savedFP.auftrag;
+    FP.reisen = savedFP.reisen;
+    FP.invest = savedFP.invest;
+    FP.finanz = savedFP.finanz;
+    FP.rpfBegruendung = savedFP.rpfBegruendung;
+    FP.mittelDritterRows = savedFP.mittelDritterRows;
+    FP.kopiPartner = savedFP.kopiPartner;
+    FP._nextId = savedFP._nextId;
+    Diff.baseline = savedBaseline;
+    this.jahre = savedJahre;
+    FP.rebuildAllTables();
+    this.saveToStorage();
+
+    return snapshot;
   },
 
   // ---- Field search ----

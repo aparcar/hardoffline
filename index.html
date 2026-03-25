@@ -40,6 +40,7 @@
     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabSachmittel" role="tab">5. Sachmittel</a></li>
     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabFinanzierung" role="tab">6. Finanzierung</a></li>
     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabErklaerungen" role="tab">7. Erkl&auml;rungen</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabDiff" role="tab" id="tabDiffLink"><i class="bi bi-file-diff"></i> Diff</a></li>
   </ul>
 
   <div class="tab-content mt-3 mb-5" id="mainTabContent">
@@ -391,7 +392,7 @@
         <div class="card-body table-responsive">
           <table class="table table-sm table-bordered mb-0">
             <thead class="table-light">
-              <tr><th>Name</th><th>PLZ</th><th>Ort</th><th>Land</th><th>Rolle</th><th></th></tr>
+              <tr><th><span class="form-code">Z01</span>Name</th><th><span class="form-code">Z03</span>PLZ</th><th><span class="form-code">Z04</span>Ort</th><th><span class="form-code">Z02</span>Land</th><th><span class="form-code">Z05</span>Rolle</th><th><span class="form-code">Z06</span>F&ouml;rderkennzeichen</th><th></th></tr>
             </thead>
             <tbody id="tbodyKopiPartner"></tbody>
           </table>
@@ -648,22 +649,16 @@
             <div class="card-footer"><label class="form-label">Begr&uuml;ndung (rpf)</label><textarea class="form-control" rows="2" id="rpfZusatzMaterial2" placeholder="Begr&uuml;ndung Zusatzmaterial 2..." maxlength="2000" onchange="FP.rpfBegruendung.ZusatzMaterial2=this.value"></textarea></div>
           </div>
           <div class="card mb-3" data-section="Inlandreisen">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h6 class="mb-0"><span class="form-code">F0844</span>Inlandsreisen</h6>
-              <button class="btn btn-success btn-sm" onclick="FP.addReisenRow('Inlandreisen')"><i class="bi bi-plus-circle"></i></button>
-            </div>
-            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadInlandreisen"></thead><tbody id="tbodyInlandreisen"></tbody><tfoot class="table-warning" id="tfootInlandreisen"></tfoot></table></div>
+            <div class="card-header"><h6 class="mb-0"><span class="form-code">F0844</span>Inlandsreisen</h6></div>
+            <div class="card-body" id="reisenInlandreisen"></div>
             <div class="card-footer">
               <label class="form-label">Begr&uuml;ndung Reisekosten (rpf)</label>
               <textarea class="form-control" rows="2" id="rpfInlandreisen" placeholder="Begr&uuml;ndung Inlandsreisen..." maxlength="2000" onchange="FP.rpfBegruendung.Inlandreisen=this.value"></textarea>
             </div>
           </div>
           <div class="card mb-3" data-section="Auslandreisen">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h6 class="mb-0"><span class="form-code">F0845</span>Auslandsreisen</h6>
-              <button class="btn btn-success btn-sm" onclick="FP.addReisenRow('Auslandreisen')"><i class="bi bi-plus-circle"></i></button>
-            </div>
-            <div class="card-body table-responsive"><table class="table table-sm table-bordered"><thead class="table-light" id="theadAuslandreisen"></thead><tbody id="tbodyAuslandreisen"></tbody><tfoot class="table-warning" id="tfootAuslandreisen"></tfoot></table></div>
+            <div class="card-header"><h6 class="mb-0"><span class="form-code">F0845</span>Auslandsreisen</h6></div>
+            <div class="card-body" id="reisenAuslandreisen"></div>
             <div class="card-footer">
               <label class="form-label">Begr&uuml;ndung Reisekosten (rpf)</label>
               <textarea class="form-control" rows="2" id="rpfAuslandreisen" placeholder="Begr&uuml;ndung Auslandsreisen..." maxlength="2000" onchange="FP.rpfBegruendung.Auslandreisen=this.value"></textarea>
@@ -745,40 +740,105 @@
     <div class="tab-pane fade" id="tabErklaerungen" role="tabpanel">
       <div class="row">
         <div class="col-lg-8">
+
+          <!-- E00 Erklärungen header -->
           <div class="card mb-3">
-            <div class="card-header"><h6 class="mb-0">Erkl&auml;rungen und Pflichtanlagen</h6></div>
+            <div class="card-header"><h6 class="mb-0"><span class="form-code">E00</span>Erkl&auml;rungen</h6></div>
             <div class="card-body">
-              <div class="row g-2">
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Vorhabenbeschreibung" id="chkVB"><label class="form-check-label" for="chkVB">Vorhabenbeschreibung *</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Balkenplan" id="chkBP"><label class="form-check-label" for="chkBP">Balkenplan *</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Strukturplan" id="chkSP"><label class="form-check-label" for="chkSP">Strukturplan</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Netzplan" id="chkNP"><label class="form-check-label" for="chkNP">Netzplan</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Vorkalkulationsdaten" id="chkVK"><label class="form-check-label" for="chkVK">Erl&auml;uterung des Finanzierungsplans</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Geraeteliste" id="chkGL"><label class="form-check-label" for="chkGL">Ger&auml;teliste</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Bonitaetsnachweis" id="chkBN"><label class="form-check-label" for="chkBN">Bonit&auml;tsnachweis</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Zeichnungen" id="chkZE"><label class="form-check-label" for="chkZE">Zeichnungen</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Mitfinanzierung" id="chkMF"><label class="form-check-label" for="chkMF">Mitfinanzierung</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Eigenmittel_vorhanden" id="chkEM"><label class="form-check-label" for="chkEM">Eigenmittel vorhanden</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Personal_investition" id="chkPI"><label class="form-check-label" for="chkPI">Personalausgaben</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="GeguInvest" id="chkGI"><label class="form-check-label" for="chkGI">Gegenst&auml;nde und Investitionen</label></div></div>
-                <div class="col-md-6">
-                  <div class="form-check"><input class="form-check-input" type="checkbox" data-field="Folgekosten" id="chkFK"><label class="form-check-label" for="chkFK">Werden durch das Vorhaben weitere Ausgaben entstehen?</label></div>
-                  <div class="row g-2 mt-1 ms-3" id="folgekostenDetails" style="display:none">
-                    <div class="col-12"><label class="form-label"><span class="form-code">E41</span>H&ouml;he der Folgeausgaben</label><input type="text" class="form-control form-control-sm" data-field="Folgekosten_Betrag"></div>
-                    <div class="col-12"><label class="form-label"><span class="form-code">E42</span>Art und Tr&auml;ger/in</label><input type="text" class="form-control form-control-sm" data-field="Folgekosten_Beschreibung" maxlength="45"></div>
-                  </div>
-                </div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Grundfinanzierung" id="chkGF"><label class="form-check-label" for="chkGF">Grundfinanzierung</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Einvernehmen_mit_Landesressort" id="chkEL"><label class="form-check-label" for="chkEL">Einvernehmen mit Landesressort</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="subventionserheblicheTatsachen" id="chkSU"><label class="form-check-label" for="chkSU">Subventionserhebliche Tatsachen</label></div></div>
-                <div class="col-md-6"><div class="form-check"><input class="form-check-input" type="checkbox" data-field="Einverstaendnis_Vollstaendigkeit" id="chkEV"><label class="form-check-label" for="chkEV">Vollst&auml;ndigkeit und Einverst&auml;ndnis</label></div></div>
+              <p class="text-muted small mb-0">Bitte achten Sie bei der Dateneingabe auf den Meldungsbereich im unteren Bereich des Fensters. Hier werden Ihnen Fehler, Hinweise und ggf. noch auszuf&uuml;llende Datenfelder angezeigt.</p>
+            </div>
+          </div>
+
+          <!-- Unterlagen zum Antrag -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Unterlagen zum Antrag</h6></div>
+            <div class="card-body">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Vorhabenbeschreibung" id="chkVB">
+                <label class="form-check-label" for="chkVB"><span class="form-code">E01</span>Vorhabenbeschreibung *</label>
+                <div class="form-text small">Eine Vorhabenbeschreibung (mit Verwertungsplan) gem&auml;&szlig; der Gliederung in den &bdquo;Richtlinien f&uuml;r Zuwendungsantr&auml;ge auf Ausgabenbasis AZA&ldquo; liegt bei.</div>
               </div>
-              <hr>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Balkenplan" id="chkBP">
+                <label class="form-check-label" for="chkBP"><span class="form-code">E10</span>Balkenplan (Zeitplan)</label>
+                <div class="form-text small">Ein Balkenplan (Zeitplan) ist im Anhang beigef&uuml;gt.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Strukturplan" id="chkSP">
+                <label class="form-check-label" for="chkSP"><span class="form-code">E11</span>Strukturplan</label>
+                <div class="form-text small">Ein Strukturplan liegt bei. (ggf. bei umfangreichen Vorhaben)</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Netzplan" id="chkNP">
+                <label class="form-check-label" for="chkNP"><span class="form-code">E12</span>Netzplan</label>
+                <div class="form-text small">Ein Netzplan liegt bei. (ggf. bei umfangreichen Vorhaben)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sonstige Unterlagen -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Sonstige Unterlagen</h6></div>
+            <div class="card-body">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Vorkalkulationsdaten" id="chkVK">
+                <label class="form-check-label" for="chkVK"><span class="form-code">E20</span>Erl&auml;uterung des Finanzierungsplans *</label>
+                <div class="form-text small">Erl&auml;uterungen zu den einzelnen Positionen des Finanzierungsplans gem&auml;&szlig; den Richtlinien (vgl. Nr. 1) liegen bei.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Geraeteliste" id="chkGL">
+                <label class="form-check-label" for="chkGL"><span class="form-code">E21</span>Ger&auml;teliste</label>
+                <div class="form-text small">Eine Liste der Gegenst&auml;nde und anderer Investitionen ist beigef&uuml;gt.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Bonitaetsnachweis" id="chkBN">
+                <label class="form-check-label" for="chkBN"><span class="form-code">E22</span>Bonit&auml;t</label>
+                <div class="form-text small">Die in den Richtlinien f&uuml;r Antragsteller angegebenen Unterlagen zur Bonit&auml;t sind in einfacher Ausfertigung beigef&uuml;gt.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Zeichnungen" id="chkZE">
+                <label class="form-check-label" for="chkZE"><span class="form-code">E23</span>Zeichnungen</label>
+                <div class="form-text small">Es sind Zeichnungen, Skizzen und dergleichen beigef&uuml;gt.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Mitfinanzierung" id="chkMF">
+                <label class="form-check-label" for="chkMF"><span class="form-code">E24</span>Mitfinanzierung</label>
+                <div class="form-text small">Mitfinanzierungszusage(n) sind beigef&uuml;gt.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Finanzierungsplan -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Finanzierungsplan</h6></div>
+            <div class="card-body">
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Eigenmittel_vorhanden" id="chkEM">
+                <label class="form-check-label" for="chkEM"><span class="form-code">E32</span>Eigenmittel</label>
+                <div class="form-text small">Die im Gesamtfinanzierungsplan veranschlagten Eigenmittel k&ouml;nnen selbst aufgebracht werden, auch unter Ber&uuml;cksichtigung aller sonstigen finanziellen Verpflichtungen w&auml;hrend der Laufzeit des Vorhabens.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Personal_investition" id="chkPI">
+                <label class="form-check-label" for="chkPI"><span class="form-code">E33</span>Personalausgaben</label>
+                <div class="form-text small">Der Gesamtfinanzierungsplan enth&auml;lt keine Personalausgaben, die durch &ouml;ffentliche Haushalte gedeckt sind und unter den Positionen F0831, F0850 keine Investitionsausgaben, die prim&auml;r der Grundausstattung dienen.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="GeguInvest" id="chkGI">
+                <label class="form-check-label" for="chkGI"><span class="form-code">E33a</span>Gegenst&auml;nde und Investitionen</label>
+                <div class="form-text small">Die im Gesamtfinanzierungsplan veranschlagten Ausgaben f&uuml;r Gegenst&auml;nde bis 800 &euro; im Einzelfall (0831) und Gegenst&auml;nde und andere Investitionen &gt; 800 &euro; im Einzelfall (0850) sind prim&auml;r nicht der Grundausstattung zuzurechnen.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Öffentliche Förderung -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">&Ouml;ffentliche F&ouml;rderung</h6></div>
+            <div class="card-body">
               <div class="mb-3">
-                <label class="form-label">Sonstige F&ouml;rderung</label>
+                <label class="form-label"><span class="form-code">E34</span>Erkl&auml;rung *</label>
                 <select class="form-select" data-field="Sonstige_Foerderung" id="selSonstFoerd">
-                  <option value="Das Vorhaben ist oder wird nicht anderweitig mit Zuwendung oder Auftrag &ouml;ffentlich finanziert.">Nicht anderweitig &ouml;ffentlich finanziert</option>
-                  <option value="Das Vorhaben ist oder wird anderweitig mit Zuwendung oder Auftrag &ouml;ffentlich finanziert.">Anderweitig &ouml;ffentlich finanziert</option>
+                  <option value="Das Vorhaben ist oder wird nicht anderweitig mit Zuwendung oder Auftrag &ouml;ffentlich finanziert.">Das Vorhaben ist oder wird nicht anderweitig mit Zuwendung oder Auftrag &ouml;ffentlich finanziert.</option>
+                  <option value="Das Vorhaben ist oder wird anderweitig mit Zuwendung oder Auftrag &ouml;ffentlich finanziert.">Das Vorhaben ist oder wird anderweitig mit Zuwendung oder Auftrag &ouml;ffentlich finanziert.</option>
                 </select>
                 <div class="row g-2 mt-1" id="sonstFoerdDetails" style="display:none">
                   <div class="col-md-8"><label class="form-label"><span class="form-code">E35</span>Tr&auml;ger und Art</label><input type="text" class="form-control" data-field="Traeger_sonstige_Foerderung" maxlength="120"></div>
@@ -786,15 +846,62 @@
                 </div>
               </div>
               <div class="mb-3">
-                <label class="form-label">Wirtschaftlicher Bereich</label>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" data-field="Folgekosten" id="chkFK">
+                  <label class="form-check-label" for="chkFK"><span class="form-code">E40</span>Werden durch das Vorhaben weitere Ausgaben entstehen?</label>
+                </div>
+                <div class="row g-2 mt-1 ms-4" id="folgekostenDetails" style="display:none">
+                  <div class="col-md-8"><label class="form-label"><span class="form-code">E41</span>H&ouml;he der Folgeausgaben</label><input type="text" class="form-control form-control-sm" data-field="Folgekosten_Betrag"></div>
+                  <div class="col-md-4"><label class="form-label"><span class="form-code">E42</span>Art und Tr&auml;ger/in der Folgeausgaben</label><input type="text" class="form-control form-control-sm" data-field="Folgekosten_Beschreibung" maxlength="45"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Forschungseinrichtungen und Hochschulen -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Forschungseinrichtungen und Hochschulen</h6></div>
+            <div class="card-body">
+              <p class="text-muted small">Ist nur auszuf&uuml;llen, wenn es sich bei dem/der Antragsteller/in um eine Forschungseinrichtung oder Hochschule handelt.</p>
+              <div class="mb-3">
+                <label class="form-label"><span class="form-code">E50</span>Antragstellung erfolgt:</label>
                 <select class="form-select" data-field="wirtschaftlichen_Bereich_J_N_N">
                   <option value="(trifft nicht auf den Antragsteller zu)">(trifft nicht auf den Antragsteller zu)</option>
                   <option value="f&uuml;r den nicht-wirtschaftlichen Bereich">f&uuml;r den nicht-wirtschaftlichen Bereich</option>
                   <option value="f&uuml;r den wirtschaftlichen Bereich">f&uuml;r den wirtschaftlichen Bereich</option>
                 </select>
               </div>
+              <p class="text-muted small">Gilt nur f&uuml;r staatliche Hochschulen:</p>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Grundfinanzierung" id="chkGF">
+                <label class="form-check-label" for="chkGF"><span class="form-code">E51</span>Grundfinanzierung</label>
+                <div class="form-text small">Das Land beteiligt sich an den vorhabenbezogenen Gesamtausgaben durch die Finanzierung der Grundausstattung.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Einvernehmen_mit_Landesressort" id="chkEL">
+                <label class="form-check-label" for="chkEL"><span class="form-code">E52</span>Einvernehmen mit Landesressort</label>
+                <div class="form-text small">&Uuml;ber den Antrag besteht Einvernehmen mit dem zust&auml;ndigen Landesressort.</div>
+              </div>
             </div>
           </div>
+
+          <!-- Allgemeine Erklärungen -->
+          <div class="card mb-3">
+            <div class="card-header"><h6 class="mb-0">Allgemeine Erkl&auml;rungen</h6></div>
+            <div class="card-body">
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" data-field="subventionserheblicheTatsachen" id="chkSU">
+                <label class="form-check-label" for="chkSU"><span class="form-code">E60</span>Subventionserhebliche Tatsachen *</label>
+                <div class="form-text small">Mir/Uns ist die Strafbarkeit eines Subventionsbetrugs nach &sect; 264 des Strafgesetzbuches bekannt. Ich/Wir habe(n) davon Kenntnis genommen, dass die in Anlage A des Dokuments Subventionserhebliche Tatsachen aufgef&uuml;hrten Tatsachen Subventionserhebliche Tatsachen im Sinne des &sect; 264 des Strafgesetzbuches sind.</div>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="Einverstaendnis_Vollstaendigkeit" id="chkEV">
+                <label class="form-check-label" for="chkEV"><span class="form-code">E61</span>Vollst&auml;ndigkeit und Einverst&auml;ndnis *</label>
+                <div class="form-text small">Die Richtigkeit und Vollst&auml;ndigkeit der Angaben im Antrag wird versichert; die &bdquo;Richtlinien f&uuml;r Zuwendungsantr&auml;ge auf Ausgabenbasis (AZA)&ldquo; sind beachtet worden. Das Einverst&auml;ndnis zur Pr&uuml;fung des Antrags durch Sachverst&auml;ndige/Gutachter/innen wird erkl&auml;rt.</div>
+              </div>
+            </div>
+          </div>
+
         </div>
         <div class="col-lg-4">
           <div class="card mb-3">
@@ -823,6 +930,35 @@
       </div>
     </div>
 
+    <!-- ==================== TAB 8: DIFF ==================== -->
+    <div class="tab-pane fade" id="tabDiff" role="tabpanel">
+      <div class="row">
+        <div class="col-lg-10">
+          <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0"><i class="bi bi-file-diff"></i> &Auml;nderungen</h6>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="diffMode" id="diffModeBaseline" value="baseline" checked>
+                  <label class="form-check-label" for="diffModeBaseline">Vergleich mit importiertem Stand</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="diffMode" id="diffModeComparison" value="comparison">
+                  <label class="form-check-label" for="diffModeComparison">Vergleich mit hochgeladener XML-Datei</label>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm ms-2 d-none" id="btnUploadComparison"><i class="bi bi-upload"></i> XML hochladen</button>
+                <input type="file" id="fileInputComparison" accept=".xml" class="d-none">
+                <span class="ms-2 text-muted d-none" id="comparisonFileName"></span>
+              </div>
+              <div id="diffOutput"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /tab-content -->
 </div><!-- /container -->
 
@@ -833,5 +969,6 @@
 <script src="js/finanzplan.js"></script>
 <script src="js/xml-export.js"></script>
 <script src="js/xml-import.js"></script>
+<script src="js/diff.js"></script>
 </body>
 </html>

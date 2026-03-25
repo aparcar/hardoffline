@@ -307,7 +307,8 @@ const XmlExport = {
         this.xf('PLZ_Strasse_KO', row.plz || ''),
         this.xf('Ort_Strasse_KO', row.ort || ''),
         this.xf('Land_KO', row.land || ''),
-        this.xf('Rolle', row.rolle || '')
+        this.xf('Rolle', row.rolle || ''),
+        this.xf('Foerderkennzeichen_KO', row.fkz || '')
       );
     });
     return this.xf('Feldgruppe_Institution_KO',
@@ -450,10 +451,10 @@ const XmlExport = {
               ['Verbrauchsmaterial','Geschaeftsbedarf','Literatur','ZusatzMaterial1','ZusatzMaterial2']
                 .reduce((s, sec) => s + FP.yearSubtotalSach(sec, j), 0))
           ),
-          // Reisen
+          // Reisen (TabIDs must be globally unique across both sub-sections)
           this.xf('Feldgruppe_Reisen',
-            this.buildReisen('Inlandreisen', jahre),
-            this.buildReisen('Auslandreisen', jahre),
+            this.buildReisen('Inlandreisen', jahre, 0),
+            this.buildReisen('Auslandreisen', jahre, this.reisenRowCount('Inlandreisen', jahre)),
             ...this.zwischensummenBetrag(jahre, j =>
               FP.yearSubtotalReisen('Inlandreisen', j) + FP.yearSubtotalReisen('Auslandreisen', j))
           ),
@@ -700,32 +701,48 @@ const XmlExport = {
   },
 
   // --- Reisen ---
-  buildReisen(section, jahre) {
-    const rows = FP.reisen[section] || [];
+  reisenRowCount(section, jahre) {
+    const data = FP.reisen[section] || {};
+    let count = 0;
+    jahre.forEach(j => { count += (data[j] || []).length; });
+    return count;
+  },
 
-    const tabPositions = rows.flatMap((row, idx) => {
-      const zeileNr = idx + 1;
-      return jahre.map(j =>
-        this.xf('Tabellenposition', { Jahr: j, TabID: zeileNr },
-          this.xf('ZeileNr', zeileNr),
-          this.xf('Reiseziel', row.reiseziel),
-          this.xf('Reisezweck', row.reisezweck),
-          this.xf('Reisedauer', App.parseNum(row.reisedauer)),
-          this.xf('BetragSumme', this.round2(App.parseNum(row.entries[j])))
-        )
-      );
+  buildReisen(section, jahre, tabIdOffset) {
+    const sectionData = FP.reisen[section] || {};
+    tabIdOffset = tabIdOffset || 0;
+
+    // Collect all rows across all years, assign sequential TabIDs
+    let tabIdCounter = 0;
+    const tabPositions = [];
+    const gesamtRows = []; // { tabId, zeileNr, reiseziel, totalSum }
+
+    jahre.forEach(j => {
+      const rows = sectionData[j] || [];
+      rows.forEach((row, idx) => {
+        tabIdCounter++;
+        const tabId = tabIdCounter + tabIdOffset;
+        const zeileNr = idx + 1;
+        tabPositions.push(
+          this.xf('Tabellenposition', { Jahr: j, TabID: tabId },
+            this.xf('ZeileNr', zeileNr),
+            this.xf('Reiseziel', row.reiseziel),
+            this.xf('Reisezweck', row.reisezweck),
+            this.xf('Reisedauer', App.parseNum(row.reisedauer)),
+            this.xf('BetragSumme', this.round2(App.parseNum(row.betrag)))
+          )
+        );
+        gesamtRows.push({ tabId, zeileNr, reiseziel: row.reiseziel, totalSum: App.parseNum(row.betrag) });
+      });
     });
 
-    const gesamtansichten = rows.map((row, idx) => {
-      const zeileNr = idx + 1;
-      let totalSum = 0;
-      jahre.forEach(j => { totalSum += App.parseNum(row.entries[j]); });
-      return this.xf('Gesamtansicht', { Jahr: 'Gesamt', TabID: zeileNr },
-        this.xf('ZeileNr', zeileNr),
-        this.xf('Reiseziel', row.reiseziel),
-        this.xf('BetragSumme', this.round2(totalSum))
-      );
-    });
+    const gesamtansichten = gesamtRows.map(g =>
+      this.xf('Gesamtansicht', { Jahr: 'Gesamt', TabID: g.tabId },
+        this.xf('ZeileNr', g.zeileNr),
+        this.xf('Reiseziel', g.reiseziel),
+        this.xf('BetragSumme', this.round2(g.totalSum))
+      )
+    );
 
     const rpf = FP.rpfBegruendung[section] || '';
     const einzelposition = rpf
