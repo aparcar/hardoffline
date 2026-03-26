@@ -905,10 +905,25 @@
         </div>
         <div class="col-lg-4">
           <div class="card mb-3">
-            <div class="card-header"><h6 class="mb-0">Zusatzinformationen</h6></div>
+            <div class="card-header"><h6 class="mb-0">Anlagen und Formulare zum Antrag</h6></div>
             <div class="card-body">
-              <div class="form-check mb-2"><input class="form-check-input" type="checkbox" data-field="KMU_Status" id="chkKMU"><label class="form-check-label" for="chkKMU">Unternehmen in Schwierigkeiten</label></div>
-              <div class="form-check mb-2"><input class="form-check-input" type="checkbox" data-field="KeinUnternehmen" id="chkKU"><label class="form-check-label" for="chkKU">Leibniz-Institut oder &auml;hnliche Einrichtung/Verein</label></div>
+              <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" data-field="KeinUnternehmen" id="chkKU">
+                <label class="form-check-label" for="chkKU">Leibniz-Institut oder &auml;hnliche Einrichtung/Verein</label>
+                <div class="form-text small">Ich bin ein Leibniz-Institut oder eine &auml;hnliche Einrichtung/Verein, der nicht die Kriterien eines &bdquo;Unternehmens&ldquo; im Sinne der EU-Beihilferegeln erf&uuml;llt. Meine Einrichtung/Verein dient prim&auml;r der Forschung und Entwicklung und &uuml;bt nicht &uuml;berwiegend wirtschaftliche T&auml;tigkeit aus, die mit anderen Unternehmen konkurriert.</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Doktorandenverg&uuml;tung *</label>
+                <select class="form-select form-select-sm" data-field="Doktoranden">
+                  <option value="">(bitte w&auml;hlen)</option>
+                  <option value="Mit der beantragten F&ouml;rderung werden keine Doktoranden verg&uuml;tet.">Mit der beantragten F&ouml;rderung werden keine Doktoranden verg&uuml;tet.</option>
+                  <option value="Die hier beantragte Doktorandenverg&uuml;tung entspricht der grunds&auml;tzlichen Regelung an der Einrichtung. Die H&ouml;he der Verg&uuml;tung ist unabh&auml;ngig von der Finanzierungsquelle (Grundhaushalt oder Drittmittel).">Doktorandenverg&uuml;tung entspricht der grunds&auml;tzlichen Regelung an der Einrichtung.</option>
+                </select>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" data-field="KMU_Status" id="chkKMU">
+                <label class="form-check-label" for="chkKMU">Unternehmen in Schwierigkeiten</label>
+              </div>
             </div>
           </div>
           <div class="card mb-3">

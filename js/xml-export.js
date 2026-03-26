@@ -631,7 +631,7 @@ const XmlExport = {
       const zeileNr = idx + 1;
       return jahre.map(j => this.xf('Tabellenposition', { Jahr: j, TabID: zeileNr },
         this.xf('ZeileNr', zeileNr),
-        this.xf('Bezeichnung', row.bezeichnung),
+        this.xf('Bezeichnung_AU', row.bezeichnung),
         this.xf('IstBekannt', row.istBekannt || 'Ja'),
         this.xf('Name_AU', row.nameAU || ''),
         this.xf('Land_AU', row.landAU || 'Deutschland'),
@@ -647,7 +647,7 @@ const XmlExport = {
       jahre.forEach(j => { total += App.parseNum(row.entries[j]); });
       return this.xf('Gesamtansicht', { Jahr: 'Gesamt', TabID: zeileNr },
         this.xf('ZeileNr', zeileNr),
-        this.xf('Bezeichnung', row.bezeichnung),
+        this.xf('Bezeichnung_AU', row.bezeichnung),
         this.xf('IstBekannt', row.istBekannt || 'Ja'),
         this.xf('Name_AU', row.nameAU || ''),
         this.xf('Land_AU', row.landAU || 'Deutschland'),
@@ -968,7 +968,8 @@ const XmlExport = {
         this.xf('Maske_Zusatzinformationen_1',
           this.xf('Einzelposition',
             this.xfField('KMU_Status'),
-            this.xfField('KeinUnternehmen')
+            this.xfField('KeinUnternehmen'),
+            this.xfField('Doktoranden')
           )
         )
       ),

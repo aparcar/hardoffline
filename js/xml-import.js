@@ -515,7 +515,7 @@ const XmlImport = {
       if (!tabId) return;
       if (!rowMap[tabId]) {
         rowMap[tabId] = {
-          bezeichnung: this.xfText(tp, 'Bezeichnung'),
+          bezeichnung: this.xfText(tp, 'Bezeichnung_AU') || this.xfText(tp, 'Bezeichnung'),
           istBekannt: this.xfText(tp, 'IstBekannt') || 'Ja',
           nameAU: this.xfText(tp, 'Name_AU'),
           landAU: this.xfText(tp, 'Land_AU') || 'Deutschland',
@@ -771,6 +771,7 @@ const XmlImport = {
       if (ep) {
         this.setField('KMU_Status', this.xfText(ep, 'KMU_Status'));
         this.setField('KeinUnternehmen', this.xfText(ep, 'KeinUnternehmen'));
+        this.setField('Doktoranden', this.xfText(ep, 'Doktoranden'));
       }
     }
   }
